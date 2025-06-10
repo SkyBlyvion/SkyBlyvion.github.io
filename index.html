@@ -12,6 +12,10 @@
       --bg-dark:  #222;
       --text-dark: #eee;
       --accent:    #4CAF50;
+      --strength-weak: #e74c3c;    /* Rouge */
+      --strength-medium: #f1c40f;  /* Jaune */
+      --strength-strong: #2ecc71;  /* Vert */
+      --strength-very-strong: #0a7a3b; /* Vert foncé */
     }
     body {
       margin: 0;
@@ -23,6 +27,8 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 1rem; /* Added padding for smaller screens */
+      box-sizing: border-box; /* Include padding in element's total width and height */
     }
     body.dark {
       background-color: var(--bg-dark);
@@ -33,7 +39,7 @@
       padding: 2rem;
       border-radius: 1rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      max-width: 450px; /* Légèrement plus large pour les nouveaux champs */
+      max-width: 450px; /* Adjusted max-width as fewer options */
       width: 100%;
     }
     body.dark .container {
@@ -57,24 +63,25 @@
       justify-content: space-between;
       align-items: center;
     }
-    .controls .char-option .min-input-group { /* Nouveau style pour le groupe "Minimum" */
+    .controls .char-option .min-input-group {
         display: flex;
         align-items: center;
         gap: 0.25rem;
     }
     .controls .char-option input[type="number"] {
-        width: 60px; /* Plus petit pour les nombres */
+        width: 60px;
         text-align: center;
     }
-    select, button, input[type="text"] {
+
+    select, input[type="text"], input[type="number"] {
       width: 100%;
       padding: 0.5rem;
       font-size: 1rem;
       border-radius: 0.5rem;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
     body.dark select, 
-    body.dark button, 
     body.dark input[type="text"],
     body.dark input[type="number"] {
       background: #444;
@@ -86,14 +93,58 @@
       background: var(--accent);
       color: white;
       border: none;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
     }
     button:hover {
       opacity: 0.9;
     }
+    .password-output-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .password-output-group input[type="text"] {
+        flex-grow: 1;
+    }
+    .password-output-group button {
+        width: auto;
+        padding: 0.5rem 0.75rem;
+        background: #6c757d;
+    }
+    .password-output-group button:hover {
+        background: #5a6268;
+    }
+
     .strength {
       text-align: center;
       margin-top: 0.5rem;
       font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .strength-bar {
+      height: 10px;
+      border-radius: 5px;
+      background-color: #ddd;
+      overflow: hidden;
+    }
+    .strength-indicator {
+      height: 100%;
+      width: 0%;
+      background-color: var(--strength-weak);
+      transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    }
+    .strength-text {
+      color: var(--text-light);
+    }
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        text-align: center;
+        min-height: 1.2rem;
     }
     .toggle-theme {
       display: flex;
@@ -114,134 +165,158 @@
         <select id="lengthSelect">
           <option value="8">8 caractères</option>
           <option value="12">12 caractères</option>
-          <option value="16">16 caractères</option>
-          <option value="20" selected>20 caractères</option>
+          <option value="16" selected>16 caractères</option>
+          <option value="20">20 caractères</option>
           <option value="24">24 caractères</option>
           <option value="30">30 caractères</option>
+          <option value="40">40 caractères</option>
+          <option value="50">50 caractères</option>
         </select>
       </label>
       
       <div class="char-option">
-        <label><input type="checkbox" id="includeLower" checked> Lettres minuscules (a-z)</label>
+        <label><input type="checkbox" id="includeLower" checked> Minuscules (a-z)</label>
         <div class="min-input-group">
             <label for="minLower">Min:</label>
-            <input type="number" id="minLower" value="1" min="0" max="10">
+            <input type="number" id="minLower" value="3" min="0" max="50">
         </div>
       </div>
       <div class="char-option">
-        <label><input type="checkbox" id="includeUpper" checked> Lettres majuscules (A-Z)</label>
+        <label><input type="checkbox" id="includeUpper" checked> Majuscules (A-Z)</label>
         <div class="min-input-group">
             <label for="minUpper">Min:</label>
-            <input type="number" id="minUpper" value="1" min="0" max="10">
+            <input type="number" id="minUpper" value="3" min="0" max="50">
         </div>
       </div>
       <div class="char-option">
         <label><input type="checkbox" id="includeDigits" checked> Chiffres (0-9)</label>
         <div class="min-input-group">
             <label for="minDigits">Min:</label>
-            <input type="number" id="minDigits" value="1" min="0" max="10">
+            <input type="number" id="minDigits" value="3" min="0" max="50">
         </div>
       </div>
       <div class="char-option">
         <label><input type="checkbox" id="includeSpecial" checked> Caractères spéciaux (%$!@#^&*) </label>
         <div class="min-input-group">
             <label for="minSpecial">Min:</label>
-            <input type="number" id="minSpecial" value="1" min="0" max="10">
+            <input type="number" id="minSpecial" value="5" min="0" max="50">
         </div>
       </div>
 
       <button id="generateBtn">Générer</button>
-      <input type="text" id="passwordOutput" readonly placeholder="Votre mot de passe">
+      <div id="errorMessage" class="error-message"></div> 
+      <div class="password-output-group">
+        <input type="text" id="passwordOutput" readonly placeholder="Votre mot de passe">
+        <button id="toggleVisibilityBtn" title="Afficher/Masquer le mot de passe">🙈</button> 
+      </div>
       <button id="copyBtn">Copier&nbsp;📋</button>
-      <div id="strengthText" class="strength"></div>
+      
+      <div id="strengthDisplay" class="strength">
+        <div class="strength-bar">
+          <div id="strengthIndicator" class="strength-indicator"></div>
+        </div>
+        <div id="strengthText" class="strength-text">Robustesse : Non évaluée</div>
+      </div>
     </div>
   </div>
 
   <script>
-    // Éléments du DOM
-    const lengthSelect    = document.getElementById('lengthSelect');
-    const includeLower    = document.getElementById('includeLower');
-    const minLower        = document.getElementById('minLower');
-    const includeUpper    = document.getElementById('includeUpper');
-    const minUpper        = document.getElementById('minUpper');
-    const includeDigits   = document.getElementById('includeDigits');
-    const minDigits       = document.getElementById('minDigits');
-    const includeSpecial  = document.getElementById('includeSpecial');
-    const minSpecial      = document.getElementById('minSpecial');
-    const generateBtn     = document.getElementById('generateBtn');
-    const passwordOutput  = document.getElementById('passwordOutput');
-    const copyBtn         = document.getElementById('copyBtn');
-    const strengthText    = document.getElementById('strengthText');
-    const themeToggle     = document.getElementById('themeToggle');
-    const body            = document.body;
+    // Éléments du DOM (centralisés)
+    const DOMElements = {
+        lengthSelect:           document.getElementById('lengthSelect'),
+        includeLower:           document.getElementById('includeLower'),
+        minLower:               document.getElementById('minLower'),
+        includeUpper:           document.getElementById('includeUpper'),
+        minUpper:               document.getElementById('minUpper'),
+        includeDigits:          document.getElementById('includeDigits'),
+        minDigits:              document.getElementById('minDigits'),
+        includeSpecial:         document.getElementById('includeSpecial'),
+        minSpecial:             document.getElementById('minSpecial'),
+        generateBtn:            document.getElementById('generateBtn'),
+        passwordOutput:         document.getElementById('passwordOutput'),
+        toggleVisibilityBtn:    document.getElementById('toggleVisibilityBtn'),
+        copyBtn:                document.getElementById('copyBtn'),
+        strengthText:           document.getElementById('strengthText'),
+        strengthIndicator:      document.getElementById('strengthIndicator'),
+        strengthDisplay:        document.getElementById('strengthDisplay'),
+        themeToggle:            document.getElementById('themeToggle'),
+        body:                   document.body,
+        errorMessage:           document.getElementById('errorMessage')
+    };
 
-    // Jeu de caractères
-    const CHAR_SETS = {
+    // Jeu de caractères de base
+    const BASE_CHAR_SETS = {
       lower:   'abcdefghijklmnopqrstuvwxyz',
       upper:   'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
       digits:  '0123456789',
-      special: '%$!@#^&*' // Vous pouvez étendre ce jeu si nécessaire
+      special: '%$!@#^&*' 
     };
 
     /**
      * Génère un mot de passe sécurisé.
      * Garantie : au moins le nombre spécifié de chaque type sélectionné.
+     * Tente de générer un mot de passe "Très fort" par défaut.
      */
     function generatePassword() {
-      const length = parseInt(lengthSelect.value);
+      DOMElements.errorMessage.textContent = ''; // Effacer le message d'erreur précédent
+
+      const length = parseInt(DOMElements.lengthSelect.value);
       let characterRequirements = [];
       let totalGuaranteedCount = 0;
+      let allCharsPool = ''; // Pool de tous les caractères possibles pour les caractères restants
 
-      if (includeLower.checked) {
-        const count = parseInt(minLower.value) || 0; // S'assurer que c'est un nombre valide
-        characterRequirements.push({ type: 'lower', chars: CHAR_SETS.lower, minCount: count });
+      // Collecter les exigences de caractères et calculer le total garanti
+      if (DOMElements.includeLower.checked) {
+        const count = parseInt(DOMElements.minLower.value) || 0;
+        characterRequirements.push({ type: 'lower', chars: BASE_CHAR_SETS.lower, minCount: count });
         totalGuaranteedCount += count;
+        allCharsPool += BASE_CHAR_SETS.lower;
       }
-      if (includeUpper.checked) {
-        const count = parseInt(minUpper.value) || 0;
-        characterRequirements.push({ type: 'upper', chars: CHAR_SETS.upper, minCount: count });
+      if (DOMElements.includeUpper.checked) {
+        const count = parseInt(DOMElements.minUpper.value) || 0;
+        characterRequirements.push({ type: 'upper', chars: BASE_CHAR_SETS.upper, minCount: count });
         totalGuaranteedCount += count;
+        allCharsPool += BASE_CHAR_SETS.upper;
       }
-      if (includeDigits.checked) {
-        const count = parseInt(minDigits.value) || 0;
-        characterRequirements.push({ type: 'digits', chars: CHAR_SETS.digits, minCount: count });
+      if (DOMElements.includeDigits.checked) {
+        const count = parseInt(DOMElements.minDigits.value) || 0;
+        characterRequirements.push({ type: 'digits', chars: BASE_CHAR_SETS.digits, minCount: count });
         totalGuaranteedCount += count;
+        allCharsPool += BASE_CHAR_SETS.digits;
       }
-      if (includeSpecial.checked) {
-        const count = parseInt(minSpecial.value) || 0;
-        characterRequirements.push({ type: 'special', chars: CHAR_SETS.special, minCount: count });
+      if (DOMElements.includeSpecial.checked) {
+        const count = parseInt(DOMElements.minSpecial.value) || 0;
+        characterRequirements.push({ type: 'special', chars: BASE_CHAR_SETS.special, minCount: count });
         totalGuaranteedCount += count;
+        allCharsPool += BASE_CHAR_SETS.special;
       }
 
       if (characterRequirements.length === 0) {
-        alert('Veuillez sélectionner au moins un type de caractères.');
+        DOMElements.errorMessage.textContent = 'Veuillez sélectionner au moins un type de caractères.';
         return '';
       }
 
       if (totalGuaranteedCount > length) {
-        alert(`Le nombre minimum de caractères requis (${totalGuaranteedCount}) dépasse la longueur totale du mot de passe (${length}). Veuillez ajuster.`);
+        DOMElements.errorMessage.textContent = `Le nombre minimum de caractères requis (${totalGuaranteedCount}) dépasse la longueur totale (${length}). Veuillez ajuster.`;
+        return '';
+      }
+
+      // Assurez-vous que le pool n'est pas vide si la longueur totale est > 0
+      if (allCharsPool.length === 0 && length > 0) {
+        DOMElements.errorMessage.textContent = 'Aucun type de caractère n\'a été sélectionné pour générer le mot de passe.';
         return '';
       }
 
       let pwdArray = [];
-      let allCharsPool = ''; // Pool de tous les caractères possibles pour les caractères restants
 
       // 1) Garantir le minimum de chaque type sélectionné
       characterRequirements.forEach(req => {
-        allCharsPool += req.chars; // Ajouter au pool global
         for (let i = 0; i < req.minCount; i++) {
           const charIndex = crypto.getRandomValues(new Uint32Array(1))[0] % req.chars.length;
           pwdArray.push(req.chars.charAt(charIndex));
         }
       });
       
-      // Assurez-vous que le pool n'est pas vide pour les caractères restants
-      if (allCharsPool.length === 0 && length > 0) {
-        alert('Aucun type de caractère n\'a été sélectionné pour générer le mot de passe.');
-        return '';
-      }
-
-
       // 2) Remplir le reste du mot de passe jusqu'à la longueur souhaitée
       const remainingLength = length - pwdArray.length;
       for (let i = 0; i < remainingLength; i++) {
@@ -266,83 +341,218 @@
 
     /**
      * Évalue la force du mot de passe selon longueur et diversité.
+     * Score plus précis basé sur le nombre de chaque type.
      */
     function evaluateStrength(pwd) {
-      const lengthScore = Math.min(pwd.length, 20) / 20; // 0 à 1 (longueur max pour le score de 20)
-      let variety = 0;
-      if (/[a-z]/.test(pwd)) variety++;
-      if (/[A-Z]/.test(pwd)) variety++;
-      if (/[0-9]/.test(pwd)) variety++;
-      if (/[%\$!@#\^&\*]/.test(pwd)) variety++; // Assurez-vous que cela correspond au jeu de caractères spéciaux
-      const varietyScore = variety / 4; // 0 à 1, basé sur 4 types de caractères
-      const score = (lengthScore + varietyScore) / 2; // Moyenne des deux
+      if (!pwd) {
+        return { text: 'Non évaluée', score: 0 };
+      }
 
-      if (score < 0.3) return 'Faible';
-      if (score < 0.6) return 'Moyen';
-      if (score < 0.8) return 'Fort';
-      return 'Très fort';
+      let score = 0;
+      const length = pwd.length;
+
+      // Score de longueur (logarithmique pour mieux représenter la complexité)
+      // Ajusté pour que 16 caractères avec diversité soit "Très fort"
+      score += Math.log2(length) * 5; 
+
+      // Compte des types de caractères et score de variété
+      let typesCount = 0;
+      if (/[a-z]/.test(pwd)) typesCount++;
+      if (/[A-Z]/.test(pwd)) typesCount++;
+      if (/[0-9]/.test(pwd)) typesCount++;
+      if (/[%\$!@#\^&\*]/.test(pwd)) typesCount++; // Correspond au BASE_CHAR_SETS.special
+      
+      score += typesCount * 10; // Chaque type ajoute un bonus significatif, plus élevé pour favoriser la diversité
+
+      // Score basé sur le nombre de chaque type de caractère
+      score += (pwd.match(/[a-z]/g) || []).length * 0.5;
+      score += (pwd.match(/[A-Z]/g) || []).length * 0.7;
+      score += (pwd.match(/[0-9]/g) || []).length * 0.6;
+      score += (pwd.match(/[%\$!@#\^&\*]/g) || []).length * 0.8;
+
+      // Limiter le score max pour une évaluation cohérente
+      const maxScore = 100; 
+      score = Math.max(0, Math.min(score, maxScore)); // Score entre 0 et maxScore
+
+      let strengthText = '';
+      let strengthLevel = score / maxScore; // Score normalisé entre 0 et 1
+
+      if (strengthLevel < 0.25) {
+        strengthText = 'Faible';
+        DOMElements.strengthIndicator.style.backgroundColor = 'var(--strength-weak)';
+      } else if (strengthLevel < 0.5) {
+        strengthText = 'Moyen';
+        DOMElements.strengthIndicator.style.backgroundColor = 'var(--strength-medium)';
+      } else if (strengthLevel < 0.75) {
+        strengthText = 'Fort';
+        DOMElements.strengthIndicator.style.backgroundColor = 'var(--strength-strong)';
+      } else {
+        strengthText = 'Très fort';
+        DOMElements.strengthIndicator.style.backgroundColor = 'var(--strength-very-strong)';
+      }
+
+      DOMElements.strengthIndicator.style.width = `${strengthLevel * 100}%`;
+      return { text: strengthText, score: strengthLevel };
+    }
+
+    // Fonction pour mettre à jour la robustesse affichée
+    function updateStrengthDisplay(pwd = DOMElements.passwordOutput.value) {
+        const { text } = evaluateStrength(pwd);
+        DOMElements.strengthText.textContent = `Robustesse : ${text}`;
+    }
+
+    // Fonction pour ajuster dynamiquement la valeur max des inputs numériques
+    function adjustMinMaxLimits() {
+        const totalLength = parseInt(DOMElements.lengthSelect.value);
+        let currentMins = 0;
+
+        const charTypes = ['lower', 'upper', 'digits', 'special'];
+        let charMins = {};
+
+        // Récupérer les valeurs actuelles des minimums pour les types cochés
+        charTypes.forEach(type => {
+            const checkbox = DOMElements[`include${type.charAt(0).toUpperCase() + type.slice(1)}`];
+            const minInput = DOMElements[`min${type.charAt(0).toUpperCase() + type.slice(1)}`];
+            charMins[type] = parseInt(minInput.value) || 0;
+            if (checkbox.checked) {
+                currentMins += charMins[type];
+            }
+        });
+
+        // Mettre à jour le 'max' pour chaque champ 'min'
+        charTypes.forEach(type => {
+            const minInput = DOMElements[`min${type.charAt(0).toUpperCase() + type.slice(1)}`];
+            const checkbox = DOMElements[`include${type.charAt(0).toUpperCase() + type.slice(1)}`];
+            const otherMins = currentMins - charMins[type];
+            
+            // Le max d'un champ est la longueur totale moins les minimums des AUTRES types déjà cochés
+            let newMax = checkbox.checked ? Math.max(0, totalLength - otherMins) : 0;
+            minInput.max = newMax;
+            
+            // Assurer que la valeur actuelle ne dépasse pas le nouveau max
+            if (parseInt(minInput.value) > newMax) {
+                minInput.value = newMax;
+            }
+        });
     }
 
     // Gestionnaires d'événements
-    generateBtn.addEventListener('click', () => {
+    DOMElements.generateBtn.addEventListener('click', () => {
       const pwd = generatePassword();
-      if (!pwd) {
-        passwordOutput.value = ''; // Effacer le champ si la génération échoue
-        strengthText.textContent = '';
-        return;
-      }
-      passwordOutput.value = pwd;
-      strengthText.textContent = 'Robustesse : ' + evaluateStrength(pwd);
+      DOMElements.passwordOutput.value = pwd;
+      // Le champ est déjà de type 'text', donc pas besoin de changer
+      // DOMElements.passwordOutput.type = 'text'; // Cette ligne n'est plus nécessaire ici
+      DOMElements.toggleVisibilityBtn.textContent = '🙈'; // Met l'icône "masquer" par défaut
+      updateStrengthDisplay(pwd);
+      DOMElements.passwordOutput.focus(); 
+      //DOMElements.passwordOutput.select(); // Selectionne le mot de passe généré
     });
 
-    copyBtn.addEventListener('click', () => {
-      const pwd = passwordOutput.value;
+    DOMElements.copyBtn.addEventListener('click', () => {
+      const pwd = DOMElements.passwordOutput.value;
       if (!pwd) return;
       navigator.clipboard.writeText(pwd)
-        .then(() => { copyBtn.textContent = 'Copié !'; setTimeout(() => copyBtn.textContent = 'Copier 📋', 1500); })
-        .catch(() => { alert('Échec de la copie'); });
+        .then(() => { 
+            DOMElements.copyBtn.textContent = 'Copié !'; 
+            setTimeout(() => DOMElements.copyBtn.textContent = 'Copier 📋', 1500); 
+        })
+        .catch(() => { 
+            DOMElements.errorMessage.textContent = 'Échec de la copie. Veuillez copier manuellement.';
+            setTimeout(() => DOMElements.errorMessage.textContent = '', 3000); 
+        });
     });
 
-    // Mode sombre / clair
-    themeToggle.addEventListener('click', () => {
-      body.classList.toggle('dark');
-      themeToggle.textContent = body.classList.contains('dark') ? 'Mode clair' : 'Mode sombre';
+    DOMElements.toggleVisibilityBtn.addEventListener('click', () => {
+        if (DOMElements.passwordOutput.type === 'password') {
+            DOMElements.passwordOutput.type = 'text';
+            DOMElements.toggleVisibilityBtn.textContent = '🙈';
+        } else {
+            DOMElements.passwordOutput.type = 'password';
+            DOMElements.toggleVisibilityBtn.textContent = '👁️';
+        }
     });
 
-    // Synchroniser les champs numériques avec les cases à cocher
+    DOMElements.themeToggle.addEventListener('click', () => {
+      DOMElements.body.classList.toggle('dark');
+      DOMElements.themeToggle.textContent = DOMElements.body.classList.contains('dark') ? 'Mode clair' : 'Mode sombre';
+    });
+
+    // Écouteurs pour les options de caractères et les minimums
     const charOptionInputs = [
-      { checkbox: includeLower, number: minLower },
-      { checkbox: includeUpper, number: minUpper },
-      { checkbox: includeDigits, number: minDigits },
-      { checkbox: includeSpecial, number: minSpecial }
+      { checkbox: DOMElements.includeLower, number: DOMElements.minLower },
+      { checkbox: DOMElements.includeUpper, number: DOMElements.minUpper },
+      { checkbox: DOMElements.includeDigits, number: DOMElements.minDigits },
+      { checkbox: DOMElements.includeSpecial, number: DOMElements.minSpecial }
     ];
 
     charOptionInputs.forEach(item => {
-      // Désactiver le champ numérique si la case n'est pas cochée
-      item.number.disabled = !item.checkbox.checked;
+      item.number.disabled = !item.checkbox.checked; // Désactiver si décoché au chargement
+      
+      // Quand la checkbox change
       item.checkbox.addEventListener('change', () => {
         item.number.disabled = !item.checkbox.checked;
         if (!item.checkbox.checked) {
           item.number.value = '0'; // Réinitialiser à 0 si décoché
         } else {
-            // Remettre à 1 si re-coché et qu'il était à 0
-            if (parseInt(item.number.value) === 0 || item.number.value === '') { // Use parseInt for comparison
-                item.number.value = '1';
+            if (parseInt(item.number.value) === 0 || item.number.value === '') {
+                item.number.value = '1'; // Remettre à 1 si re-coché et qu'il était à 0
             }
         }
+        adjustMinMaxLimits(); 
+        updateStrengthDisplay(); 
+        DOMElements.generateBtn.click(); // Re-générer le mot de passe
       });
-       // S'assurer que le minimum est toujours 0 si la case est décochée
-       item.number.addEventListener('input', () => {
-            if (parseInt(item.number.value) === 0) { // Use parseInt for comparison
-                item.checkbox.checked = false;
-            } else {
-                item.checkbox.checked = true;
-            }
-        });
+
+      // Quand le champ numérique change
+      item.number.addEventListener('input', () => {
+          // Si la valeur est 0, décocher la checkbox (et désactiver l'input)
+          if (parseInt(item.number.value) === 0) {
+              item.checkbox.checked = false;
+              item.number.disabled = true; // S'assurer qu'il est désactivé
+          } else {
+              item.checkbox.checked = true;
+              item.number.disabled = false; // S'assurer qu'il est activé
+          }
+          adjustMinMaxLimits(); 
+          updateStrengthDisplay(); 
+          DOMElements.generateBtn.click(); // Re-générer le mot de passe
+      });
+    });
+    
+    // Écouteurs pour la mise à jour de la robustesse et des limites lors des changements de longueur
+    DOMElements.lengthSelect.addEventListener('change', () => {
+        adjustMinMaxLimits();
+        updateStrengthDisplay();
+        DOMElements.generateBtn.click(); // Re-générer le mot de passe
     });
 
-    // Générer un mot de passe au chargement
-    window.addEventListener('load', () => generateBtn.click());
+    // Générer un mot de passe au chargement et initialiser
+    window.addEventListener('load', () => {
+        // Initialiser l'état des checkboxes et inputs numériques
+        charOptionInputs.forEach(item => {
+            item.number.disabled = !item.checkbox.checked;
+        });
+
+        // S'assurer que toutes les options sont cochées par défaut pour un mot de passe très fort
+        DOMElements.includeLower.checked = true;
+        DOMElements.includeUpper.checked = true;
+        DOMElements.includeDigits.checked = true;
+        DOMElements.includeSpecial.checked = true;
+        DOMElements.minLower.value = '3';
+        DOMElements.minUpper.value = '3';
+        DOMElements.minDigits.value = '3';
+        DOMElements.minSpecial.value = '5';
+
+        // Sélectionner une longueur plus élevée par défaut pour "Très fort"
+        DOMElements.lengthSelect.value = '20'; 
+
+        // Rendre le champ du mot de passe de type "text" par défaut
+        DOMElements.passwordOutput.type = 'text'; 
+        DOMElements.toggleVisibilityBtn.textContent = '🙈'; // Mettre l'icône pour masquer
+        
+        adjustMinMaxLimits(); // Initialiser les limites au chargement
+        DOMElements.generateBtn.click(); // Générer un premier mot de passe
+    });
   </script>
 </body>
 </html>
