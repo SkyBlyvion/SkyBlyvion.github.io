@@ -27,8 +27,8 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 1rem; /* Added padding for smaller screens */
-      box-sizing: border-box; /* Include padding in element's total width and height */
+      padding: 1rem;
+      box-sizing: border-box;
     }
     body.dark {
       background-color: var(--bg-dark);
@@ -39,7 +39,7 @@
       padding: 2rem;
       border-radius: 1rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      max-width: 450px; /* Adjusted max-width as fewer options */
+      max-width: 450px;
       width: 100%;
     }
     body.dark .container {
@@ -203,6 +203,12 @@
         </div>
       </div>
 
+      <!-- NOUVELLE OPTION -->
+      <label>
+        <input type="checkbox" id="avoidConsecutive" checked>
+        Interdire deux caractères identiques à la suite
+      </label>
+
       <button id="generateBtn">Générer</button>
       <div id="errorMessage" class="error-message"></div> 
       <div class="password-output-group">
@@ -241,7 +247,8 @@
         strengthDisplay:        document.getElementById('strengthDisplay'),
         themeToggle:            document.getElementById('themeToggle'),
         body:                   document.body,
-        errorMessage:           document.getElementById('errorMessage')
+        errorMessage:           document.getElementById('errorMessage'),
+        avoidConsecutive:       document.getElementById('avoidConsecutive')
     };
 
     // Jeu de caractères de base
@@ -252,6 +259,101 @@
       special: '%$!@#^&*' 
     };
 
+    // Utils RNG
+    function randIndex(maxExclusive) {
+      return crypto.getRandomValues(new Uint32Array(1))[0] % maxExclusive;
+    }
+
+    function getRandomCharFromSet(setStr, excludeSet = new Set()) {
+      if (!setStr || setStr.length === 0) return '';
+      // Essais aléatoires d'abord
+      for (let tries = 0; tries < 32; tries++) {
+        const c = setStr.charAt(randIndex(setStr.length));
+        if (!excludeSet.has(c)) return c;
+      }
+      // Fallback déterministe
+      for (let i = 0; i < setStr.length; i++) {
+        const c = setStr.charAt(i);
+        if (!excludeSet.has(c)) return c;
+      }
+      return ''; // impossible si setStr a >= 1 char non exclu
+    }
+
+    function charTypeOf(ch) {
+      if (BASE_CHAR_SETS.lower.includes(ch)) return 'lower';
+      if (BASE_CHAR_SETS.upper.includes(ch)) return 'upper';
+      if (BASE_CHAR_SETS.digits.includes(ch)) return 'digits';
+      if (BASE_CHAR_SETS.special.includes(ch)) return 'special';
+      return null;
+    }
+
+    function countTypes(arr) {
+      const map = { lower: 0, upper: 0, digits: 0, special: 0 };
+      for (const c of arr) {
+        const t = charTypeOf(c);
+        if (t) map[t]++;
+      }
+      return map;
+    }
+
+    /**
+     * Corrige un tableau de caractères pour supprimer tout doublon consécutif,
+     * en respectant les min par type.
+     */
+    function enforceNoConsecutiveDuplicates(pwdArray, allCharsPool, minMap) {
+      const out = pwdArray.slice();
+      const counts = countTypes(out);
+
+      // Sécurité: si le pool n'a qu'un seul caractère, impossible d'éviter les doublons consécutifs
+      const uniquePool = Array.from(new Set(allCharsPool.split('')));
+      if (uniquePool.length <= 1 && out.length > 1) {
+        DOMElements.errorMessage.textContent = 'Impossible d’éviter les doublons consécutifs avec un pool d’un seul caractère.';
+        return out;
+      }
+
+      for (let i = 1; i < out.length; i++) {
+        if (out[i] === out[i - 1]) {
+          const original = out[i];
+          const originalType = charTypeOf(original);
+          const exclude = new Set([out[i - 1]]);
+          if (i + 1 < out.length) exclude.add(out[i + 1]); // éviter de créer un nouveau doublon
+
+          let replacement = '';
+          // Si on est au minimum pour ce type, on doit remplacer par le même type
+          if (originalType && counts[originalType] <= (minMap[originalType] || 0)) {
+            replacement = getRandomCharFromSet(BASE_CHAR_SETS[originalType], exclude);
+            if (!replacement) {
+              // en dernier recours, choisir autre chose qui ne casse pas un autre min
+              replacement = getRandomCharFromSet(allCharsPool, exclude);
+              const newType = charTypeOf(replacement);
+              if (newType && newType !== originalType) {
+                // garder les compteurs cohérents
+                counts[originalType] = Math.max(0, counts[originalType] - 1);
+                counts[newType] = (counts[newType] || 0) + 1;
+              }
+            }
+          } else {
+            // Libre de changer de type si ça ne fait pas descendre en dessous du min
+            replacement = getRandomCharFromSet(allCharsPool, exclude);
+            const newType = charTypeOf(replacement);
+            if (originalType && newType && newType !== originalType) {
+              counts[originalType] = Math.max(0, counts[originalType] - 1);
+              counts[newType] = (counts[newType] || 0) + 1;
+            }
+          }
+
+          // Sécurité finale si replacement vide (très improbable)
+          if (!replacement) {
+            // choisir un char différent du précédent dans le pool unique
+            replacement = uniquePool.find(c => c !== out[i - 1]) || out[i];
+          }
+
+          out[i] = replacement;
+        }
+      }
+      return out;
+    }
+
     /**
      * Génère un mot de passe sécurisé.
      * Garantie : au moins le nombre spécifié de chaque type sélectionné.
@@ -261,6 +363,8 @@
       DOMElements.errorMessage.textContent = ''; // Effacer le message d'erreur précédent
 
       const length = parseInt(DOMElements.lengthSelect.value);
+      const avoidConsecutive = DOMElements.avoidConsecutive.checked;
+
       let characterRequirements = [];
       let totalGuaranteedCount = 0;
       let allCharsPool = ''; // Pool de tous les caractères possibles pour les caractères restants
@@ -312,31 +416,52 @@
       // 1) Garantir le minimum de chaque type sélectionné
       characterRequirements.forEach(req => {
         for (let i = 0; i < req.minCount; i++) {
-          const charIndex = crypto.getRandomValues(new Uint32Array(1))[0] % req.chars.length;
-          pwdArray.push(req.chars.charAt(charIndex));
+          let c = req.chars.charAt(randIndex(req.chars.length));
+          if (DOMElements.avoidConsecutive.checked && pwdArray.length > 0) {
+            const exclude = new Set([pwdArray[pwdArray.length - 1]]);
+            // éviter un doublon lors du push du garanti
+            c = getRandomCharFromSet(req.chars, exclude);
+          }
+          pwdArray.push(c);
         }
       });
       
       // 2) Remplir le reste du mot de passe jusqu'à la longueur souhaitée
       const remainingLength = length - pwdArray.length;
       for (let i = 0; i < remainingLength; i++) {
-        const charIndex = crypto.getRandomValues(new Uint32Array(1))[0] % allCharsPool.length;
-        pwdArray.push(allCharsPool.charAt(charIndex));
+        let c = allCharsPool.charAt(randIndex(allCharsPool.length));
+        if (DOMElements.avoidConsecutive.checked && pwdArray.length > 0) {
+          const exclude = new Set([pwdArray[pwdArray.length - 1]]);
+          c = getRandomCharFromSet(allCharsPool, exclude);
+        }
+        pwdArray.push(c);
       }
 
-      // 3) Mélanger et retourner
-      return shuffleArray(pwdArray).join('');
+      // 3) Mélanger
+      const shuffled = shuffleArray(pwdArray);
+
+      // 4) Si demandé, corriger les doublons consécutifs après mélange
+      if (avoidConsecutive) {
+        // Construire la map des min par type
+        const minMap = { lower: 0, upper: 0, digits: 0, special: 0 };
+        characterRequirements.forEach(r => { minMap[r.type] = r.minCount; });
+        const fixed = enforceNoConsecutiveDuplicates(shuffled, allCharsPool, minMap);
+        return fixed.join('');
+      }
+
+      return shuffled.join('');
     }
 
     /**
      * Mélange un tableau (algorithme de Fisher–Yates).
      */
     function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = randIndex(i + 1);
+        [a[i], a[j]] = [a[j], a[i]];
       }
-      return arr;
+      return a;
     }
 
     /**
@@ -352,7 +477,6 @@
       const length = pwd.length;
 
       // Score de longueur (logarithmique pour mieux représenter la complexité)
-      // Ajusté pour que 16 caractères avec diversité soit "Très fort"
       score += Math.log2(length) * 5; 
 
       // Compte des types de caractères et score de variété
@@ -362,7 +486,7 @@
       if (/[0-9]/.test(pwd)) typesCount++;
       if (/[%\$!@#\^&\*]/.test(pwd)) typesCount++; // Correspond au BASE_CHAR_SETS.special
       
-      score += typesCount * 10; // Chaque type ajoute un bonus significatif, plus élevé pour favoriser la diversité
+      score += typesCount * 10;
 
       // Score basé sur le nombre de chaque type de caractère
       score += (pwd.match(/[a-z]/g) || []).length * 0.5;
@@ -370,12 +494,11 @@
       score += (pwd.match(/[0-9]/g) || []).length * 0.6;
       score += (pwd.match(/[%\$!@#\^&\*]/g) || []).length * 0.8;
 
-      // Limiter le score max pour une évaluation cohérente
       const maxScore = 100; 
-      score = Math.max(0, Math.min(score, maxScore)); // Score entre 0 et maxScore
+      score = Math.max(0, Math.min(score, maxScore));
 
       let strengthText = '';
-      let strengthLevel = score / maxScore; // Score normalisé entre 0 et 1
+      let strengthLevel = score / maxScore;
 
       if (strengthLevel < 0.25) {
         strengthText = 'Faible';
@@ -424,12 +547,8 @@
             const minInput = DOMElements[`min${type.charAt(0).toUpperCase() + type.slice(1)}`];
             const checkbox = DOMElements[`include${type.charAt(0).toUpperCase() + type.slice(1)}`];
             const otherMins = currentMins - charMins[type];
-            
-            // Le max d'un champ est la longueur totale moins les minimums des AUTRES types déjà cochés
             let newMax = checkbox.checked ? Math.max(0, totalLength - otherMins) : 0;
             minInput.max = newMax;
-            
-            // Assurer que la valeur actuelle ne dépasse pas le nouveau max
             if (parseInt(minInput.value) > newMax) {
                 minInput.value = newMax;
             }
@@ -440,12 +559,9 @@
     DOMElements.generateBtn.addEventListener('click', () => {
       const pwd = generatePassword();
       DOMElements.passwordOutput.value = pwd;
-      // Le champ est déjà de type 'text', donc pas besoin de changer
-      // DOMElements.passwordOutput.type = 'text'; // Cette ligne n'est plus nécessaire ici
-      DOMElements.toggleVisibilityBtn.textContent = '🙈'; // Met l'icône "masquer" par défaut
+      DOMElements.toggleVisibilityBtn.textContent = '🙈';
       updateStrengthDisplay(pwd);
       DOMElements.passwordOutput.focus(); 
-      //DOMElements.passwordOutput.select(); // Selectionne le mot de passe généré
     });
 
     DOMElements.copyBtn.addEventListener('click', () => {
@@ -477,6 +593,13 @@
       DOMElements.themeToggle.textContent = DOMElements.body.classList.contains('dark') ? 'Mode clair' : 'Mode sombre';
     });
 
+    // Regénérer quand l'option anti-doublon change
+    DOMElements.avoidConsecutive.addEventListener('change', () => {
+      adjustMinMaxLimits();
+      updateStrengthDisplay();
+      DOMElements.generateBtn.click();
+    });
+
     // Écouteurs pour les options de caractères et les minimums
     const charOptionInputs = [
       { checkbox: DOMElements.includeLower, number: DOMElements.minLower },
@@ -486,36 +609,33 @@
     ];
 
     charOptionInputs.forEach(item => {
-      item.number.disabled = !item.checkbox.checked; // Désactiver si décoché au chargement
+      item.number.disabled = !item.checkbox.checked; 
       
-      // Quand la checkbox change
       item.checkbox.addEventListener('change', () => {
         item.number.disabled = !item.checkbox.checked;
         if (!item.checkbox.checked) {
-          item.number.value = '0'; // Réinitialiser à 0 si décoché
+          item.number.value = '0';
         } else {
             if (parseInt(item.number.value) === 0 || item.number.value === '') {
-                item.number.value = '1'; // Remettre à 1 si re-coché et qu'il était à 0
+                item.number.value = '1';
             }
         }
         adjustMinMaxLimits(); 
         updateStrengthDisplay(); 
-        DOMElements.generateBtn.click(); // Re-générer le mot de passe
+        DOMElements.generateBtn.click();
       });
 
-      // Quand le champ numérique change
       item.number.addEventListener('input', () => {
-          // Si la valeur est 0, décocher la checkbox (et désactiver l'input)
           if (parseInt(item.number.value) === 0) {
               item.checkbox.checked = false;
-              item.number.disabled = true; // S'assurer qu'il est désactivé
+              item.number.disabled = true;
           } else {
               item.checkbox.checked = true;
-              item.number.disabled = false; // S'assurer qu'il est activé
+              item.number.disabled = false;
           }
           adjustMinMaxLimits(); 
           updateStrengthDisplay(); 
-          DOMElements.generateBtn.click(); // Re-générer le mot de passe
+          DOMElements.generateBtn.click();
       });
     });
     
@@ -523,17 +643,15 @@
     DOMElements.lengthSelect.addEventListener('change', () => {
         adjustMinMaxLimits();
         updateStrengthDisplay();
-        DOMElements.generateBtn.click(); // Re-générer le mot de passe
+        DOMElements.generateBtn.click();
     });
 
     // Générer un mot de passe au chargement et initialiser
     window.addEventListener('load', () => {
-        // Initialiser l'état des checkboxes et inputs numériques
         charOptionInputs.forEach(item => {
             item.number.disabled = !item.checkbox.checked;
         });
 
-        // S'assurer que toutes les options sont cochées par défaut pour un mot de passe très fort
         DOMElements.includeLower.checked = true;
         DOMElements.includeUpper.checked = true;
         DOMElements.includeDigits.checked = true;
@@ -543,15 +661,13 @@
         DOMElements.minDigits.value = '3';
         DOMElements.minSpecial.value = '5';
 
-        // Sélectionner une longueur plus élevée par défaut pour "Très fort"
         DOMElements.lengthSelect.value = '20'; 
 
-        // Rendre le champ du mot de passe de type "text" par défaut
         DOMElements.passwordOutput.type = 'text'; 
-        DOMElements.toggleVisibilityBtn.textContent = '🙈'; // Mettre l'icône pour masquer
+        DOMElements.toggleVisibilityBtn.textContent = '🙈';
         
-        adjustMinMaxLimits(); // Initialiser les limites au chargement
-        DOMElements.generateBtn.click(); // Générer un premier mot de passe
+        adjustMinMaxLimits();
+        DOMElements.generateBtn.click();
     });
   </script>
 </body>
