@@ -1,674 +1,1311 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Générateur de mot de passe sécurisé</title>
-  <style>
-    /* Styles globaux */
-    :root {
-      --bg-light: #f0f0f0;
-      --text-light: #333;
-      --bg-dark:  #222;
-      --text-dark: #eee;
-      --accent:    #4CAF50;
-      --strength-weak: #e74c3c;    /* Rouge */
-      --strength-medium: #f1c40f;  /* Jaune */
-      --strength-strong: #2ecc71;  /* Vert */
-      --strength-very-strong: #0a7a3b; /* Vert foncé */
-    }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: var(--bg-light);
-      color: var(--text-light);
-      transition: background-color 0.3s, color 0.3s;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 1rem;
-      box-sizing: border-box;
-    }
-    body.dark {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
-    .container {
-      background: rgba(255,255,255,0.8);
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      max-width: 450px;
-      width: 100%;
-    }
-    body.dark .container {
-      background: rgba(0,0,0,0.6);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    .controls {
-      display: grid;
-      gap: 0.75rem;
-    }
-    .controls label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .controls .char-option {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .controls .char-option .min-input-group {
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1" />
+    <title>Générateur de mot de passe sécurisé</title>
+    <style>
+      :root {
+        --bg-light: #f0f0f0;
+        --text-light: #333;
+        --bg-dark: #141414;
+        --text-dark: #eee;
+        --accent: #4caf50;
+        --accent-soft: rgba(76, 175, 80, 0.15);
+        --header-bg-light: #ffffff;
+        --header-bg-dark: #1f1f1f;
+        --footer-bg-light: #ffffff;
+        --footer-bg-dark: #1f1f1f;
+        --card-bg-light: rgba(255, 255, 255, 0.9);
+        --card-bg-dark: rgba(0, 0, 0, 0.6);
+        --border-light: #ddd;
+        --border-dark: #444;
+        --strength-weak: #e74c3c;
+        --strength-medium: #f1c40f;
+        --strength-strong: #2ecc71;
+        --strength-very-strong: #0a7a3b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Arial, sans-serif;
+        background-color: var(--bg-light);
+        color: var(--text-light);
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      body.dark {
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
+      }
+
+      .app {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: var(--header-bg-light);
+        border-bottom: 1px solid var(--border-light);
+        backdrop-filter: blur(6px);
+      }
+
+      body.dark header {
+        background-color: var(--header-bg-dark);
+        border-bottom-color: var(--border-dark);
+      }
+
+      .header-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0.75rem 1rem;
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-    }
-    .controls .char-option input[type="number"] {
-        width: 60px;
-        text-align: center;
-    }
+        justify-content: space-between;
+        gap: 1rem;
+      }
 
-    select, input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-    body.dark select, 
-    body.dark input[type="text"],
-    body.dark input[type="number"] {
-      background: #444;
-      border-color: #555;
-      color: var(--text-dark);
-    }
-    button {
-      cursor: pointer;
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 0.75rem;
-      font-size: 1rem;
-      border-radius: 0.5rem;
-    }
-    button:hover {
-      opacity: 0.9;
-    }
-    .password-output-group {
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      .brand-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+
+      .brand-subtitle {
+        font-size: 0.8rem;
+        opacity: 0.75;
+      }
+
+      nav {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .nav-link {
+        border: none;
+        background: transparent;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.8;
+        transition: background-color 0.15s, opacity 0.15s, transform 0.05s;
+      }
+
+      .nav-link:hover {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      body.dark .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.06);
+      }
+
+      .nav-link--active {
+        opacity: 1;
+        background-color: var(--accent-soft);
+        transform: translateY(-1px);
+      }
+
+      .theme-toggle-btn {
+        border-radius: 999px;
+        border: 1px solid var(--border-light);
+        padding: 0.35rem 0.75rem;
+        background: transparent;
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+
+      body.dark .theme-toggle-btn {
+        border-color: var(--border-dark);
+      }
+
+      main {
+        flex: 1;
+        max-width: 960px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 1.5rem 1rem 2rem;
+      }
+
+      .section {
+        display: none;
+      }
+
+      .section.section--active {
+        display: block;
+      }
+
+      .section-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .card {
+        background-color: var(--card-bg-light);
+        padding: 1.5rem;
+        border-radius: 0.9rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+      }
+
+      body.dark .card {
+        background-color: var(--card-bg-dark);
+        border-color: rgba(255, 255, 255, 0.04);
+      }
+
+      .generator-card {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .controls {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .controls label {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
-    .password-output-group input[type="text"] {
-        flex-grow: 1;
-    }
-    .password-output-group button {
-        width: auto;
-        padding: 0.5rem 0.75rem;
-        background: #6c757d;
-    }
-    .password-output-group button:hover {
-        background: #5a6268;
-    }
+        font-size: 0.9rem;
+      }
 
-    .strength {
-      text-align: center;
-      margin-top: 0.5rem;
-      font-weight: bold;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .strength-bar {
-      height: 10px;
-      border-radius: 5px;
-      background-color: #ddd;
-      overflow: hidden;
-    }
-    .strength-indicator {
-      height: 100%;
-      width: 0%;
-      background-color: var(--strength-weak);
-      transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
-    }
-    .strength-text {
-      color: var(--text-light);
-    }
-    .error-message {
+      .controls .char-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .controls .char-option .min-input-group {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .controls .char-option input[type="number"] {
+        width: 60px;
+        text-align: center;
+        padding-inline: 0.25rem;
+      }
+
+      select,
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 0.45rem 0.6rem;
+        font-size: 0.9rem;
+        border-radius: 0.5rem;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        color: inherit;
+      }
+
+      body.dark select,
+      body.dark input[type="text"],
+      body.dark input[type="number"] {
+        background: #444;
+        border-color: #555;
+        color: var(--text-dark);
+      }
+
+      button {
+        cursor: pointer;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+        padding: 0.6rem 0.9rem;
+        width: 100%;
+      }
+
+      .btn-primary:hover {
+        opacity: 0.95;
+      }
+
+      .btn-ghost {
+        background: #6c757d;
+        color: #fff;
+        padding: 0.45rem 0.7rem;
+      }
+
+      .btn-ghost:hover {
+        background: #5a6268;
+      }
+
+      .password-output-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .password-output-group input[type="text"],
+      .password-output-group input[type="password"] {
+        flex-grow: 1;
+      }
+
+      .strength {
+        text-align: center;
+        margin-top: 0.5rem;
+        font-weight: 500;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .strength-bar {
+        height: 10px;
+        border-radius: 5px;
+        background-color: #ddd;
+        overflow: hidden;
+      }
+
+      body.dark .strength-bar {
+        background-color: #444;
+      }
+
+      .strength-indicator {
+        height: 100%;
+        width: 0%;
+        background-color: var(--strength-weak);
+        transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+      }
+
+      .strength-text {
+        color: inherit;
+      }
+
+      .error-message {
         color: #e74c3c;
         font-size: 0.85rem;
         text-align: center;
         min-height: 1.2rem;
-    }
-    .toggle-theme {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 1rem;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="toggle-theme">
-      <button id="themeToggle">Mode sombre</button>
+      }
+
+      .options-inline-note {
+        font-size: 0.8rem;
+        opacity: 0.8;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 0.5rem;
+      }
+
+      .stat-value {
+        font-size: 1.3rem;
+        font-weight: 600;
+      }
+
+      .stat-label {
+        font-size: 0.85rem;
+        opacity: 0.8;
+      }
+
+      .history-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 0.5rem 0 0;
+        font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        font-size: 0.8rem;
+        max-height: 180px;
+        overflow-y: auto;
+      }
+
+      .history-list li {
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      body.dark .history-list li {
+        border-bottom-color: rgba(255, 255, 255, 0.06);
+      }
+
+      .history-password {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .history-meta {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        flex-shrink: 0;
+      }
+
+      .help-list {
+        font-size: 0.9rem;
+        padding-left: 1.2rem;
+      }
+
+      .help-list li {
+        margin-bottom: 0.4rem;
+      }
+
+      footer {
+        border-top: 1px solid var(--border-light);
+        background-color: var(--footer-bg-light);
+        font-size: 0.8rem;
+      }
+
+      body.dark footer {
+        background-color: var(--footer-bg-dark);
+        border-top-color: var(--border-dark);
+      }
+
+      .footer-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0.75rem 1rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        opacity: 0.85;
+      }
+
+      .footer-inner a {
+        color: inherit;
+        text-decoration: underline;
+        text-decoration-thickness: 0.06em;
+        text-underline-offset: 0.15em;
+      }
+
+      @media (max-width: 640px) {
+        .header-inner {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        nav {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .generator-card {
+          padding: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <div class="header-inner">
+          <div class="brand">
+            <div class="brand-title">SecurePass Studio</div>
+            <div class="brand-subtitle">
+              Générateur de mots de passe locaux, sans tracking.
+            </div>
+          </div>
+          <nav>
+            <button
+              class="nav-link nav-link--active"
+              data-section="section-generator"
+              aria-current="page">
+              Générateur
+            </button>
+            <button
+              class="nav-link"
+              data-section="section-dashboard">
+              Tableau de bord
+            </button>
+            <button
+              class="nav-link"
+              data-section="section-help">
+              Aide
+            </button>
+            <button
+              id="themeToggle"
+              class="theme-toggle-btn"
+              type="button">
+              Mode sombre
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <!-- SECTION GENERATEUR -->
+        <section
+          id="section-generator"
+          class="section section--active">
+          <h2 class="section-title">Générateur de mot de passe</h2>
+          <div class="card generator-card">
+            <div class="controls">
+              <label>
+                Longueur totale :
+                <select id="lengthSelect">
+                  <option value="8">8 caractères</option>
+                  <option value="12">12 caractères</option>
+                  <option value="16" selected>16 caractères</option>
+                  <option value="20">20 caractères</option>
+                  <option value="24">24 caractères</option>
+                  <option value="30">30 caractères</option>
+                  <option value="40">40 caractères</option>
+                  <option value="50">50 caractères</option>
+                </select>
+              </label>
+
+              <div class="char-option">
+                <label>
+                  <input
+                    type="checkbox"
+                    id="includeLower"
+                    checked />
+                  Minuscules (a-z)
+                </label>
+                <div class="min-input-group">
+                  <label for="minLower">Min :</label>
+                  <input
+                    type="number"
+                    id="minLower"
+                    value="3"
+                    min="0"
+                    max="50" />
+                </div>
+              </div>
+
+              <div class="char-option">
+                <label>
+                  <input
+                    type="checkbox"
+                    id="includeUpper"
+                    checked />
+                  Majuscules (A-Z)
+                </label>
+                <div class="min-input-group">
+                  <label for="minUpper">Min :</label>
+                  <input
+                    type="number"
+                    id="minUpper"
+                    value="3"
+                    min="0"
+                    max="50" />
+                </div>
+              </div>
+
+              <div class="char-option">
+                <label>
+                  <input
+                    type="checkbox"
+                    id="includeDigits"
+                    checked />
+                  Chiffres (0-9)
+                </label>
+                <div class="min-input-group">
+                  <label for="minDigits">Min :</label>
+                  <input
+                    type="number"
+                    id="minDigits"
+                    value="3"
+                    min="0"
+                    max="50" />
+                </div>
+              </div>
+
+              <div class="char-option">
+                <label>
+                  <input
+                    type="checkbox"
+                    id="includeSpecial"
+                    checked />
+                  Caractères spéciaux (%$!@#^&*)
+                </label>
+                <div class="min-input-group">
+                  <label for="minSpecial">Min :</label>
+                  <input
+                    type="number"
+                    id="minSpecial"
+                    value="5"
+                    min="0"
+                    max="50" />
+                </div>
+              </div>
+
+              <label>
+                <input
+                  type="checkbox"
+                  id="avoidConsecutive"
+                  checked />
+                Interdire deux caractères identiques à la suite
+              </label>
+
+              <p class="options-inline-note">
+                Astuce : pour un compte critique, visez au moins 20 caractères,
+                tous types inclus.
+              </p>
+
+              <button
+                id="generateBtn"
+                class="btn-primary"
+                type="button">
+                Générer
+              </button>
+
+              <div
+                id="errorMessage"
+                class="error-message"></div>
+
+              <div class="password-output-group">
+                <input
+                  type="text"
+                  id="passwordOutput"
+                  readonly
+                  placeholder="Votre mot de passe" />
+                <button
+                  id="toggleVisibilityBtn"
+                  class="btn-ghost"
+                  type="button"
+                  title="Afficher/Masquer le mot de passe">
+                  🙈
+                </button>
+              </div>
+
+              <button
+                id="copyBtn"
+                class="btn-primary"
+                type="button">
+                Copier 📋
+              </button>
+
+              <div
+                id="strengthDisplay"
+                class="strength">
+                <div class="strength-bar">
+                  <div
+                    id="strengthIndicator"
+                    class="strength-indicator"></div>
+                </div>
+                <div
+                  id="strengthText"
+                  class="strength-text">
+                  Robustesse : Non évaluée
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION TABLEAU DE BORD -->
+        <section
+          id="section-dashboard"
+          class="section">
+          <h2 class="section-title">Tableau de bord</h2>
+          <div class="card">
+            <p style="font-size: 0.9rem; margin-top: 0; margin-bottom: 0.75rem">
+              Statistiques locales de cette session seulement. Rien n’est envoyé
+              sur un serveur.
+            </p>
+            <div class="dashboard-grid">
+              <div>
+                <div class="stat-value" id="statCount">0</div>
+                <div class="stat-label">
+                  Mots de passe générés (session)
+                </div>
+              </div>
+              <div>
+                <div
+                  class="stat-value"
+                  id="statAvgLength">
+                  0
+                </div>
+                <div class="stat-label">
+                  Longueur moyenne
+                </div>
+              </div>
+              <div>
+                <div
+                  class="stat-value"
+                  id="statLastGenerated">
+                  —
+                </div>
+                <div class="stat-label">
+                  Dernière génération
+                </div>
+              </div>
+            </div>
+
+            <h3 style="margin-top: 1.25rem; font-size: 1rem; margin-bottom: 0.35rem">
+              Historique des derniers mots de passe
+            </h3>
+            <p style="margin-top: 0; font-size: 0.8rem; opacity: 0.8">
+              Maximum 10 entrées, stockées uniquement en mémoire (elles
+              disparaîtront au rechargement de la page).
+            </p>
+            <ul
+              id="historyList"
+              class="history-list"></ul>
+          </div>
+        </section>
+
+        <!-- SECTION AIDE -->
+        <section
+          id="section-help"
+          class="section">
+          <h2 class="section-title">Aide et bonnes pratiques</h2>
+          <div class="card">
+            <p style="margin-top: 0; font-size: 0.95rem">
+              Quelques conseils de base pour utiliser ce générateur de manière
+              efficace :
+            </p>
+            <ul class="help-list">
+              <li>
+                Utilisez un
+                <strong>mot de passe différent pour chaque service</strong>.
+              </li>
+              <li>
+                Privilégiez une
+                <strong>longueur ≥ 16–20 caractères</strong> avec tous les
+                types activés.
+              </li>
+              <li>
+                Ne stockez jamais vos mots de passe en clair dans un fichier
+                texte synchronisé sans chiffrement.
+              </li>
+              <li>
+                Idéalement,
+                <strong>combinez ce générateur avec un coffre-fort</strong>
+                chiffré (KeePass, fichiers KDBX, etc.).
+              </li>
+              <li>
+                Évitez d’utiliser ce générateur sur une machine que vous ne
+                contrôlez pas (poste public, PC d’hôtel, etc.).
+              </li>
+            </ul>
+            <p style="font-size: 0.9rem; margin-top: 0.75rem">
+              Ce site est purement statique : aucun mot de passe n’est envoyé
+              sur un serveur. Tout se fait dans votre navigateur.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="footer-inner">
+          <span>Générateur local – sans tracking.</span>
+          <span>
+            Code hébergé sur GitHub Pages · Pensez à vérifier le code source
+            avant d’utiliser en production.
+          </span>
+        </div>
+      </footer>
     </div>
-    <h1>Générateur de mot de passe</h1>
-    <div class="controls">
-      <label>
-        Longueur totale:
-        <select id="lengthSelect">
-          <option value="8">8 caractères</option>
-          <option value="12">12 caractères</option>
-          <option value="16" selected>16 caractères</option>
-          <option value="20">20 caractères</option>
-          <option value="24">24 caractères</option>
-          <option value="30">30 caractères</option>
-          <option value="40">40 caractères</option>
-          <option value="50">50 caractères</option>
-        </select>
-      </label>
-      
-      <div class="char-option">
-        <label><input type="checkbox" id="includeLower" checked> Minuscules (a-z)</label>
-        <div class="min-input-group">
-            <label for="minLower">Min:</label>
-            <input type="number" id="minLower" value="3" min="0" max="50">
-        </div>
-      </div>
-      <div class="char-option">
-        <label><input type="checkbox" id="includeUpper" checked> Majuscules (A-Z)</label>
-        <div class="min-input-group">
-            <label for="minUpper">Min:</label>
-            <input type="number" id="minUpper" value="3" min="0" max="50">
-        </div>
-      </div>
-      <div class="char-option">
-        <label><input type="checkbox" id="includeDigits" checked> Chiffres (0-9)</label>
-        <div class="min-input-group">
-            <label for="minDigits">Min:</label>
-            <input type="number" id="minDigits" value="3" min="0" max="50">
-        </div>
-      </div>
-      <div class="char-option">
-        <label><input type="checkbox" id="includeSpecial" checked> Caractères spéciaux (%$!@#^&*) </label>
-        <div class="min-input-group">
-            <label for="minSpecial">Min:</label>
-            <input type="number" id="minSpecial" value="5" min="0" max="50">
-        </div>
-      </div>
 
-      <!-- NOUVELLE OPTION -->
-      <label>
-        <input type="checkbox" id="avoidConsecutive" checked>
-        Interdire deux caractères identiques à la suite
-      </label>
+    <script>
+      // Centralisation des éléments DOM
+      const DOMElements = {
+        lengthSelect: document.getElementById("lengthSelect"),
+        includeLower: document.getElementById("includeLower"),
+        minLower: document.getElementById("minLower"),
+        includeUpper: document.getElementById("includeUpper"),
+        minUpper: document.getElementById("minUpper"),
+        includeDigits: document.getElementById("includeDigits"),
+        minDigits: document.getElementById("minDigits"),
+        includeSpecial: document.getElementById("includeSpecial"),
+        minSpecial: document.getElementById("minSpecial"),
+        generateBtn: document.getElementById("generateBtn"),
+        passwordOutput: document.getElementById("passwordOutput"),
+        toggleVisibilityBtn: document.getElementById("toggleVisibilityBtn"),
+        copyBtn: document.getElementById("copyBtn"),
+        strengthText: document.getElementById("strengthText"),
+        strengthIndicator: document.getElementById("strengthIndicator"),
+        strengthDisplay: document.getElementById("strengthDisplay"),
+        themeToggle: document.getElementById("themeToggle"),
+        body: document.body,
+        errorMessage: document.getElementById("errorMessage"),
+        avoidConsecutive: document.getElementById("avoidConsecutive"),
+        navLinks: document.querySelectorAll(".nav-link[data-section]"),
+        sections: document.querySelectorAll(".section"),
+        statCount: document.getElementById("statCount"),
+        statAvgLength: document.getElementById("statAvgLength"),
+        statLastGenerated: document.getElementById("statLastGenerated"),
+        historyList: document.getElementById("historyList"),
+      };
 
-      <button id="generateBtn">Générer</button>
-      <div id="errorMessage" class="error-message"></div> 
-      <div class="password-output-group">
-        <input type="text" id="passwordOutput" readonly placeholder="Votre mot de passe">
-        <button id="toggleVisibilityBtn" title="Afficher/Masquer le mot de passe">🙈</button> 
-      </div>
-      <button id="copyBtn">Copier&nbsp;📋</button>
-      
-      <div id="strengthDisplay" class="strength">
-        <div class="strength-bar">
-          <div id="strengthIndicator" class="strength-indicator"></div>
-        </div>
-        <div id="strengthText" class="strength-text">Robustesse : Non évaluée</div>
-      </div>
-    </div>
-  </div>
+      // Jeu de caractères de base
+      const BASE_CHAR_SETS = {
+        lower: "abcdefghijklmnopqrstuvwxyz",
+        upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        digits: "0123456789",
+        special: "%$!@#^&*",
+      };
 
-  <script>
-    // Éléments du DOM (centralisés)
-    const DOMElements = {
-        lengthSelect:           document.getElementById('lengthSelect'),
-        includeLower:           document.getElementById('includeLower'),
-        minLower:               document.getElementById('minLower'),
-        includeUpper:           document.getElementById('includeUpper'),
-        minUpper:               document.getElementById('minUpper'),
-        includeDigits:          document.getElementById('includeDigits'),
-        minDigits:              document.getElementById('minDigits'),
-        includeSpecial:         document.getElementById('includeSpecial'),
-        minSpecial:             document.getElementById('minSpecial'),
-        generateBtn:            document.getElementById('generateBtn'),
-        passwordOutput:         document.getElementById('passwordOutput'),
-        toggleVisibilityBtn:    document.getElementById('toggleVisibilityBtn'),
-        copyBtn:                document.getElementById('copyBtn'),
-        strengthText:           document.getElementById('strengthText'),
-        strengthIndicator:      document.getElementById('strengthIndicator'),
-        strengthDisplay:        document.getElementById('strengthDisplay'),
-        themeToggle:            document.getElementById('themeToggle'),
-        body:                   document.body,
-        errorMessage:           document.getElementById('errorMessage'),
-        avoidConsecutive:       document.getElementById('avoidConsecutive')
-    };
+      // Statistiques de la session
+      const sessionStats = {
+        count: 0,
+        totalLength: 0,
+        lastGeneratedAt: null,
+        history: [],
+        historyLimit: 10,
+      };
 
-    // Jeu de caractères de base
-    const BASE_CHAR_SETS = {
-      lower:   'abcdefghijklmnopqrstuvwxyz',
-      upper:   'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-      digits:  '0123456789',
-      special: '%$!@#^&*' 
-    };
-
-    // Utils RNG
-    function randIndex(maxExclusive) {
-      return crypto.getRandomValues(new Uint32Array(1))[0] % maxExclusive;
-    }
-
-    function getRandomCharFromSet(setStr, excludeSet = new Set()) {
-      if (!setStr || setStr.length === 0) return '';
-      // Essais aléatoires d'abord
-      for (let tries = 0; tries < 32; tries++) {
-        const c = setStr.charAt(randIndex(setStr.length));
-        if (!excludeSet.has(c)) return c;
-      }
-      // Fallback déterministe
-      for (let i = 0; i < setStr.length; i++) {
-        const c = setStr.charAt(i);
-        if (!excludeSet.has(c)) return c;
-      }
-      return ''; // impossible si setStr a >= 1 char non exclu
-    }
-
-    function charTypeOf(ch) {
-      if (BASE_CHAR_SETS.lower.includes(ch)) return 'lower';
-      if (BASE_CHAR_SETS.upper.includes(ch)) return 'upper';
-      if (BASE_CHAR_SETS.digits.includes(ch)) return 'digits';
-      if (BASE_CHAR_SETS.special.includes(ch)) return 'special';
-      return null;
-    }
-
-    function countTypes(arr) {
-      const map = { lower: 0, upper: 0, digits: 0, special: 0 };
-      for (const c of arr) {
-        const t = charTypeOf(c);
-        if (t) map[t]++;
-      }
-      return map;
-    }
-
-    /**
-     * Corrige un tableau de caractères pour supprimer tout doublon consécutif,
-     * en respectant les min par type.
-     */
-    function enforceNoConsecutiveDuplicates(pwdArray, allCharsPool, minMap) {
-      const out = pwdArray.slice();
-      const counts = countTypes(out);
-
-      // Sécurité: si le pool n'a qu'un seul caractère, impossible d'éviter les doublons consécutifs
-      const uniquePool = Array.from(new Set(allCharsPool.split('')));
-      if (uniquePool.length <= 1 && out.length > 1) {
-        DOMElements.errorMessage.textContent = 'Impossible d’éviter les doublons consécutifs avec un pool d’un seul caractère.';
-        return out;
+      // Utils RNG
+      function randIndex(maxExclusive) {
+        return crypto.getRandomValues(new Uint32Array(1))[0] % maxExclusive;
       }
 
-      for (let i = 1; i < out.length; i++) {
-        if (out[i] === out[i - 1]) {
-          const original = out[i];
-          const originalType = charTypeOf(original);
-          const exclude = new Set([out[i - 1]]);
-          if (i + 1 < out.length) exclude.add(out[i + 1]); // éviter de créer un nouveau doublon
+      function getRandomCharFromSet(setStr, excludeSet = new Set()) {
+        if (!setStr || setStr.length === 0) return "";
+        for (let tries = 0; tries < 32; tries++) {
+          const c = setStr.charAt(randIndex(setStr.length));
+          if (!excludeSet.has(c)) return c;
+        }
+        for (let i = 0; i < setStr.length; i++) {
+          const c = setStr.charAt(i);
+          if (!excludeSet.has(c)) return c;
+        }
+        return "";
+      }
 
-          let replacement = '';
-          // Si on est au minimum pour ce type, on doit remplacer par le même type
-          if (originalType && counts[originalType] <= (minMap[originalType] || 0)) {
-            replacement = getRandomCharFromSet(BASE_CHAR_SETS[originalType], exclude);
-            if (!replacement) {
-              // en dernier recours, choisir autre chose qui ne casse pas un autre min
+      function charTypeOf(ch) {
+        if (BASE_CHAR_SETS.lower.includes(ch)) return "lower";
+        if (BASE_CHAR_SETS.upper.includes(ch)) return "upper";
+        if (BASE_CHAR_SETS.digits.includes(ch)) return "digits";
+        if (BASE_CHAR_SETS.special.includes(ch)) return "special";
+        return null;
+      }
+
+      function countTypes(arr) {
+        const map = { lower: 0, upper: 0, digits: 0, special: 0 };
+        for (const c of arr) {
+          const t = charTypeOf(c);
+          if (t) map[t]++;
+        }
+        return map;
+      }
+
+      // Corrige les doublons consécutifs en respectant les min par type
+      function enforceNoConsecutiveDuplicates(pwdArray, allCharsPool, minMap) {
+        const out = pwdArray.slice();
+        const counts = countTypes(out);
+
+        const uniquePool = Array.from(new Set(allCharsPool.split("")));
+        if (uniquePool.length <= 1 && out.length > 1) {
+          DOMElements.errorMessage.textContent =
+            "Impossible d’éviter les doublons consécutifs avec un pool d’un seul caractère.";
+          return out;
+        }
+
+        for (let i = 1; i < out.length; i++) {
+          if (out[i] === out[i - 1]) {
+            const original = out[i];
+            const originalType = charTypeOf(original);
+            const exclude = new Set([out[i - 1]]);
+            if (i + 1 < out.length) exclude.add(out[i + 1]);
+
+            let replacement = "";
+            if (originalType && counts[originalType] <= (minMap[originalType] || 0)) {
+              replacement = getRandomCharFromSet(BASE_CHAR_SETS[originalType], exclude);
+              if (!replacement) {
+                replacement = getRandomCharFromSet(allCharsPool, exclude);
+                const newType = charTypeOf(replacement);
+                if (newType && newType !== originalType) {
+                  counts[originalType] = Math.max(0, counts[originalType] - 1);
+                  counts[newType] = (counts[newType] || 0) + 1;
+                }
+              }
+            } else {
               replacement = getRandomCharFromSet(allCharsPool, exclude);
               const newType = charTypeOf(replacement);
-              if (newType && newType !== originalType) {
-                // garder les compteurs cohérents
+              if (originalType && newType && newType !== originalType) {
                 counts[originalType] = Math.max(0, counts[originalType] - 1);
                 counts[newType] = (counts[newType] || 0) + 1;
               }
             }
-          } else {
-            // Libre de changer de type si ça ne fait pas descendre en dessous du min
-            replacement = getRandomCharFromSet(allCharsPool, exclude);
-            const newType = charTypeOf(replacement);
-            if (originalType && newType && newType !== originalType) {
-              counts[originalType] = Math.max(0, counts[originalType] - 1);
-              counts[newType] = (counts[newType] || 0) + 1;
+
+            if (!replacement) {
+              replacement =
+                uniquePool.find((c) => c !== out[i - 1]) ||
+                out[i];
             }
-          }
 
-          // Sécurité finale si replacement vide (très improbable)
-          if (!replacement) {
-            // choisir un char différent du précédent dans le pool unique
-            replacement = uniquePool.find(c => c !== out[i - 1]) || out[i];
+            out[i] = replacement;
           }
-
-          out[i] = replacement;
         }
-      }
-      return out;
-    }
-
-    /**
-     * Génère un mot de passe sécurisé.
-     * Garantie : au moins le nombre spécifié de chaque type sélectionné.
-     * Tente de générer un mot de passe "Très fort" par défaut.
-     */
-    function generatePassword() {
-      DOMElements.errorMessage.textContent = ''; // Effacer le message d'erreur précédent
-
-      const length = parseInt(DOMElements.lengthSelect.value);
-      const avoidConsecutive = DOMElements.avoidConsecutive.checked;
-
-      let characterRequirements = [];
-      let totalGuaranteedCount = 0;
-      let allCharsPool = ''; // Pool de tous les caractères possibles pour les caractères restants
-
-      // Collecter les exigences de caractères et calculer le total garanti
-      if (DOMElements.includeLower.checked) {
-        const count = parseInt(DOMElements.minLower.value) || 0;
-        characterRequirements.push({ type: 'lower', chars: BASE_CHAR_SETS.lower, minCount: count });
-        totalGuaranteedCount += count;
-        allCharsPool += BASE_CHAR_SETS.lower;
-      }
-      if (DOMElements.includeUpper.checked) {
-        const count = parseInt(DOMElements.minUpper.value) || 0;
-        characterRequirements.push({ type: 'upper', chars: BASE_CHAR_SETS.upper, minCount: count });
-        totalGuaranteedCount += count;
-        allCharsPool += BASE_CHAR_SETS.upper;
-      }
-      if (DOMElements.includeDigits.checked) {
-        const count = parseInt(DOMElements.minDigits.value) || 0;
-        characterRequirements.push({ type: 'digits', chars: BASE_CHAR_SETS.digits, minCount: count });
-        totalGuaranteedCount += count;
-        allCharsPool += BASE_CHAR_SETS.digits;
-      }
-      if (DOMElements.includeSpecial.checked) {
-        const count = parseInt(DOMElements.minSpecial.value) || 0;
-        characterRequirements.push({ type: 'special', chars: BASE_CHAR_SETS.special, minCount: count });
-        totalGuaranteedCount += count;
-        allCharsPool += BASE_CHAR_SETS.special;
+        return out;
       }
 
-      if (characterRequirements.length === 0) {
-        DOMElements.errorMessage.textContent = 'Veuillez sélectionner au moins un type de caractères.';
-        return '';
-      }
+      // Génération
+      function generatePassword() {
+        DOMElements.errorMessage.textContent = "";
+        const length = parseInt(DOMElements.lengthSelect.value, 10);
+        const avoidConsecutive = DOMElements.avoidConsecutive.checked;
 
-      if (totalGuaranteedCount > length) {
-        DOMElements.errorMessage.textContent = `Le nombre minimum de caractères requis (${totalGuaranteedCount}) dépasse la longueur totale (${length}). Veuillez ajuster.`;
-        return '';
-      }
+        let characterRequirements = [];
+        let totalGuaranteedCount = 0;
+        let allCharsPool = "";
 
-      // Assurez-vous que le pool n'est pas vide si la longueur totale est > 0
-      if (allCharsPool.length === 0 && length > 0) {
-        DOMElements.errorMessage.textContent = 'Aucun type de caractère n\'a été sélectionné pour générer le mot de passe.';
-        return '';
-      }
+        if (DOMElements.includeLower.checked) {
+          const count = parseInt(DOMElements.minLower.value, 10) || 0;
+          characterRequirements.push({
+            type: "lower",
+            chars: BASE_CHAR_SETS.lower,
+            minCount: count,
+          });
+          totalGuaranteedCount += count;
+          allCharsPool += BASE_CHAR_SETS.lower;
+        }
+        if (DOMElements.includeUpper.checked) {
+          const count = parseInt(DOMElements.minUpper.value, 10) || 0;
+          characterRequirements.push({
+            type: "upper",
+            chars: BASE_CHAR_SETS.upper,
+            minCount: count,
+          });
+          totalGuaranteedCount += count;
+          allCharsPool += BASE_CHAR_SETS.upper;
+        }
+        if (DOMElements.includeDigits.checked) {
+          const count = parseInt(DOMElements.minDigits.value, 10) || 0;
+          characterRequirements.push({
+            type: "digits",
+            chars: BASE_CHAR_SETS.digits,
+            minCount: count,
+          });
+          totalGuaranteedCount += count;
+          allCharsPool += BASE_CHAR_SETS.digits;
+        }
+        if (DOMElements.includeSpecial.checked) {
+          const count = parseInt(DOMElements.minSpecial.value, 10) || 0;
+          characterRequirements.push({
+            type: "special",
+            chars: BASE_CHAR_SETS.special,
+            minCount: count,
+          });
+          totalGuaranteedCount += count;
+          allCharsPool += BASE_CHAR_SETS.special;
+        }
 
-      let pwdArray = [];
+        if (characterRequirements.length === 0) {
+          DOMElements.errorMessage.textContent =
+            "Veuillez sélectionner au moins un type de caractères.";
+          return "";
+        }
 
-      // 1) Garantir le minimum de chaque type sélectionné
-      characterRequirements.forEach(req => {
-        for (let i = 0; i < req.minCount; i++) {
-          let c = req.chars.charAt(randIndex(req.chars.length));
-          if (DOMElements.avoidConsecutive.checked && pwdArray.length > 0) {
+        if (totalGuaranteedCount > length) {
+          DOMElements.errorMessage.textContent = `Le nombre minimum de caractères requis (${totalGuaranteedCount}) dépasse la longueur totale (${length}). Veuillez ajuster.`;
+          return "";
+        }
+
+        if (allCharsPool.length === 0 && length > 0) {
+          DOMElements.errorMessage.textContent =
+            "Aucun type de caractère n'a été sélectionné pour générer le mot de passe.";
+          return "";
+        }
+
+        let pwdArray = [];
+
+        characterRequirements.forEach((req) => {
+          for (let i = 0; i < req.minCount; i++) {
+            let c = req.chars.charAt(randIndex(req.chars.length));
+            if (avoidConsecutive && pwdArray.length > 0) {
+              const exclude = new Set([pwdArray[pwdArray.length - 1]]);
+              c = getRandomCharFromSet(req.chars, exclude);
+            }
+            pwdArray.push(c);
+          }
+        });
+
+        const remainingLength = length - pwdArray.length;
+        for (let i = 0; i < remainingLength; i++) {
+          let c = allCharsPool.charAt(randIndex(allCharsPool.length));
+          if (avoidConsecutive && pwdArray.length > 0) {
             const exclude = new Set([pwdArray[pwdArray.length - 1]]);
-            // éviter un doublon lors du push du garanti
-            c = getRandomCharFromSet(req.chars, exclude);
+            c = getRandomCharFromSet(allCharsPool, exclude);
           }
           pwdArray.push(c);
         }
-      });
-      
-      // 2) Remplir le reste du mot de passe jusqu'à la longueur souhaitée
-      const remainingLength = length - pwdArray.length;
-      for (let i = 0; i < remainingLength; i++) {
-        let c = allCharsPool.charAt(randIndex(allCharsPool.length));
-        if (DOMElements.avoidConsecutive.checked && pwdArray.length > 0) {
-          const exclude = new Set([pwdArray[pwdArray.length - 1]]);
-          c = getRandomCharFromSet(allCharsPool, exclude);
+
+        const shuffled = shuffleArray(pwdArray);
+
+        if (avoidConsecutive) {
+          const minMap = { lower: 0, upper: 0, digits: 0, special: 0 };
+          characterRequirements.forEach((r) => {
+            minMap[r.type] = r.minCount;
+          });
+          const fixed = enforceNoConsecutiveDuplicates(
+            shuffled,
+            allCharsPool,
+            minMap,
+          );
+          return fixed.join("");
         }
-        pwdArray.push(c);
+
+        return shuffled.join("");
       }
 
-      // 3) Mélanger
-      const shuffled = shuffleArray(pwdArray);
-
-      // 4) Si demandé, corriger les doublons consécutifs après mélange
-      if (avoidConsecutive) {
-        // Construire la map des min par type
-        const minMap = { lower: 0, upper: 0, digits: 0, special: 0 };
-        characterRequirements.forEach(r => { minMap[r.type] = r.minCount; });
-        const fixed = enforceNoConsecutiveDuplicates(shuffled, allCharsPool, minMap);
-        return fixed.join('');
+      function shuffleArray(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = randIndex(i + 1);
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
       }
 
-      return shuffled.join('');
-    }
+      // Évaluation de la robustesse
+      function evaluateStrength(pwd) {
+        if (!pwd) {
+          return { text: "Non évaluée", score: 0 };
+        }
 
-    /**
-     * Mélange un tableau (algorithme de Fisher–Yates).
-     */
-    function shuffleArray(arr) {
-      const a = arr.slice();
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = randIndex(i + 1);
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
+        let score = 0;
+        const length = pwd.length;
 
-    /**
-     * Évalue la force du mot de passe selon longueur et diversité.
-     * Score plus précis basé sur le nombre de chaque type.
-     */
-    function evaluateStrength(pwd) {
-      if (!pwd) {
-        return { text: 'Non évaluée', score: 0 };
-      }
+        score += Math.log2(length) * 5;
 
-      let score = 0;
-      const length = pwd.length;
+        let typesCount = 0;
+        if (/[a-z]/.test(pwd)) typesCount++;
+        if (/[A-Z]/.test(pwd)) typesCount++;
+        if (/[0-9]/.test(pwd)) typesCount++;
+        if (/[%\$!@#\^&\*]/.test(pwd)) typesCount++;
 
-      // Score de longueur (logarithmique pour mieux représenter la complexité)
-      score += Math.log2(length) * 5; 
+        score += typesCount * 10;
 
-      // Compte des types de caractères et score de variété
-      let typesCount = 0;
-      if (/[a-z]/.test(pwd)) typesCount++;
-      if (/[A-Z]/.test(pwd)) typesCount++;
-      if (/[0-9]/.test(pwd)) typesCount++;
-      if (/[%\$!@#\^&\*]/.test(pwd)) typesCount++; // Correspond au BASE_CHAR_SETS.special
-      
-      score += typesCount * 10;
+        score += (pwd.match(/[a-z]/g) || []).length * 0.5;
+        score += (pwd.match(/[A-Z]/g) || []).length * 0.7;
+        score += (pwd.match(/[0-9]/g) || []).length * 0.6;
+        score += (pwd.match(/[%\$!@#\^&\*]/g) || []).length * 0.8;
 
-      // Score basé sur le nombre de chaque type de caractère
-      score += (pwd.match(/[a-z]/g) || []).length * 0.5;
-      score += (pwd.match(/[A-Z]/g) || []).length * 0.7;
-      score += (pwd.match(/[0-9]/g) || []).length * 0.6;
-      score += (pwd.match(/[%\$!@#\^&\*]/g) || []).length * 0.8;
+        const maxScore = 100;
+        score = Math.max(0, Math.min(score, maxScore));
 
-      const maxScore = 100; 
-      score = Math.max(0, Math.min(score, maxScore));
+        let strengthText = "";
+        const strengthLevel = score / maxScore;
 
-      let strengthText = '';
-      let strengthLevel = score / maxScore;
+        if (strengthLevel < 0.25) {
+          strengthText = "Faible";
+          DOMElements.strengthIndicator.style.backgroundColor =
+            "var(--strength-weak)";
+        } else if (strengthLevel < 0.5) {
+          strengthText = "Moyen";
+          DOMElements.strengthIndicator.style.backgroundColor =
+            "var(--strength-medium)";
+        } else if (strengthLevel < 0.75) {
+          strengthText = "Fort";
+          DOMElements.strengthIndicator.style.backgroundColor =
+            "var(--strength-strong)";
+        } else {
+          strengthText = "Très fort";
+          DOMElements.strengthIndicator.style.backgroundColor =
+            "var(--strength-very-strong)";
+        }
 
-      if (strengthLevel < 0.25) {
-        strengthText = 'Faible';
-        DOMElements.strengthIndicator.style.backgroundColor = 'var(--strength-weak)';
-      } else if (strengthLevel < 0.5) {
-        strengthText = 'Moyen';
-        DOMElements.strengthIndicator.style.backgroundColor = 'var(--strength-medium)';
-      } else if (strengthLevel < 0.75) {
-        strengthText = 'Fort';
-        DOMElements.strengthIndicator.style.backgroundColor = 'var(--strength-strong)';
-      } else {
-        strengthText = 'Très fort';
-        DOMElements.strengthIndicator.style.backgroundColor = 'var(--strength-very-strong)';
+        DOMElements.strengthIndicator.style.width = `${strengthLevel * 100}%`;
+        return { text: strengthText, score: strengthLevel };
       }
 
-      DOMElements.strengthIndicator.style.width = `${strengthLevel * 100}%`;
-      return { text: strengthText, score: strengthLevel };
-    }
-
-    // Fonction pour mettre à jour la robustesse affichée
-    function updateStrengthDisplay(pwd = DOMElements.passwordOutput.value) {
+      function updateStrengthDisplay(pwd = DOMElements.passwordOutput.value) {
         const { text } = evaluateStrength(pwd);
         DOMElements.strengthText.textContent = `Robustesse : ${text}`;
-    }
+      }
 
-    // Fonction pour ajuster dynamiquement la valeur max des inputs numériques
-    function adjustMinMaxLimits() {
-        const totalLength = parseInt(DOMElements.lengthSelect.value);
+      // Limites dynamiques min/max
+      function adjustMinMaxLimits() {
+        const totalLength = parseInt(DOMElements.lengthSelect.value, 10);
         let currentMins = 0;
 
-        const charTypes = ['lower', 'upper', 'digits', 'special'];
-        let charMins = {};
+        const charTypes = ["lower", "upper", "digits", "special"];
+        const charMins = {};
 
-        // Récupérer les valeurs actuelles des minimums pour les types cochés
-        charTypes.forEach(type => {
-            const checkbox = DOMElements[`include${type.charAt(0).toUpperCase() + type.slice(1)}`];
-            const minInput = DOMElements[`min${type.charAt(0).toUpperCase() + type.slice(1)}`];
-            charMins[type] = parseInt(minInput.value) || 0;
-            if (checkbox.checked) {
-                currentMins += charMins[type];
-            }
-        });
-
-        // Mettre à jour le 'max' pour chaque champ 'min'
-        charTypes.forEach(type => {
-            const minInput = DOMElements[`min${type.charAt(0).toUpperCase() + type.slice(1)}`];
-            const checkbox = DOMElements[`include${type.charAt(0).toUpperCase() + type.slice(1)}`];
-            const otherMins = currentMins - charMins[type];
-            let newMax = checkbox.checked ? Math.max(0, totalLength - otherMins) : 0;
-            minInput.max = newMax;
-            if (parseInt(minInput.value) > newMax) {
-                minInput.value = newMax;
-            }
-        });
-    }
-
-    // Gestionnaires d'événements
-    DOMElements.generateBtn.addEventListener('click', () => {
-      const pwd = generatePassword();
-      DOMElements.passwordOutput.value = pwd;
-      DOMElements.toggleVisibilityBtn.textContent = '🙈';
-      updateStrengthDisplay(pwd);
-      DOMElements.passwordOutput.focus(); 
-    });
-
-    DOMElements.copyBtn.addEventListener('click', () => {
-      const pwd = DOMElements.passwordOutput.value;
-      if (!pwd) return;
-      navigator.clipboard.writeText(pwd)
-        .then(() => { 
-            DOMElements.copyBtn.textContent = 'Copié !'; 
-            setTimeout(() => DOMElements.copyBtn.textContent = 'Copier 📋', 1500); 
-        })
-        .catch(() => { 
-            DOMElements.errorMessage.textContent = 'Échec de la copie. Veuillez copier manuellement.';
-            setTimeout(() => DOMElements.errorMessage.textContent = '', 3000); 
-        });
-    });
-
-    DOMElements.toggleVisibilityBtn.addEventListener('click', () => {
-        if (DOMElements.passwordOutput.type === 'password') {
-            DOMElements.passwordOutput.type = 'text';
-            DOMElements.toggleVisibilityBtn.textContent = '🙈';
-        } else {
-            DOMElements.passwordOutput.type = 'password';
-            DOMElements.toggleVisibilityBtn.textContent = '👁️';
-        }
-    });
-
-    DOMElements.themeToggle.addEventListener('click', () => {
-      DOMElements.body.classList.toggle('dark');
-      DOMElements.themeToggle.textContent = DOMElements.body.classList.contains('dark') ? 'Mode clair' : 'Mode sombre';
-    });
-
-    // Regénérer quand l'option anti-doublon change
-    DOMElements.avoidConsecutive.addEventListener('change', () => {
-      adjustMinMaxLimits();
-      updateStrengthDisplay();
-      DOMElements.generateBtn.click();
-    });
-
-    // Écouteurs pour les options de caractères et les minimums
-    const charOptionInputs = [
-      { checkbox: DOMElements.includeLower, number: DOMElements.minLower },
-      { checkbox: DOMElements.includeUpper, number: DOMElements.minUpper },
-      { checkbox: DOMElements.includeDigits, number: DOMElements.minDigits },
-      { checkbox: DOMElements.includeSpecial, number: DOMElements.minSpecial }
-    ];
-
-    charOptionInputs.forEach(item => {
-      item.number.disabled = !item.checkbox.checked; 
-      
-      item.checkbox.addEventListener('change', () => {
-        item.number.disabled = !item.checkbox.checked;
-        if (!item.checkbox.checked) {
-          item.number.value = '0';
-        } else {
-            if (parseInt(item.number.value) === 0 || item.number.value === '') {
-                item.number.value = '1';
-            }
-        }
-        adjustMinMaxLimits(); 
-        updateStrengthDisplay(); 
-        DOMElements.generateBtn.click();
-      });
-
-      item.number.addEventListener('input', () => {
-          if (parseInt(item.number.value) === 0) {
-              item.checkbox.checked = false;
-              item.number.disabled = true;
-          } else {
-              item.checkbox.checked = true;
-              item.number.disabled = false;
+        charTypes.forEach((type) => {
+          const checkbox =
+            DOMElements[
+              `include${type.charAt(0).toUpperCase()}${type.slice(1)}`
+            ];
+          const minInput =
+            DOMElements[
+              `min${type.charAt(0).toUpperCase()}${type.slice(1)}`
+            ];
+          charMins[type] = parseInt(minInput.value, 10) || 0;
+          if (checkbox.checked) {
+            currentMins += charMins[type];
           }
-          adjustMinMaxLimits(); 
-          updateStrengthDisplay(); 
-          DOMElements.generateBtn.click();
+        });
+
+        charTypes.forEach((type) => {
+          const minInput =
+            DOMElements[
+              `min${type.charAt(0).toUpperCase()}${type.slice(1)}`
+            ];
+          const checkbox =
+            DOMElements[
+              `include${type.charAt(0).toUpperCase()}${type.slice(1)}`
+            ];
+          const otherMins = currentMins - charMins[type];
+          const newMax = checkbox.checked
+            ? Math.max(0, totalLength - otherMins)
+            : 0;
+          minInput.max = newMax;
+          if (parseInt(minInput.value, 10) > newMax) {
+            minInput.value = newMax;
+          }
+        });
+      }
+
+      // Stats + dashboard
+      function updateSessionStats(newPassword) {
+        if (!newPassword) return;
+        const length = newPassword.length;
+
+        sessionStats.count += 1;
+        sessionStats.totalLength += length;
+        sessionStats.lastGeneratedAt = new Date();
+
+        sessionStats.history.unshift({
+          password: newPassword,
+          length,
+          at: sessionStats.lastGeneratedAt,
+        });
+
+        if (sessionStats.history.length > sessionStats.historyLimit) {
+          sessionStats.history.length = sessionStats.historyLimit;
+        }
+
+        renderDashboard();
+      }
+
+      function renderDashboard() {
+        DOMElements.statCount.textContent = sessionStats.count.toString();
+
+        if (sessionStats.count === 0) {
+          DOMElements.statAvgLength.textContent = "0";
+          DOMElements.statLastGenerated.textContent = "—";
+        } else {
+          const avg =
+            sessionStats.totalLength / sessionStats.count;
+          DOMElements.statAvgLength.textContent =
+            avg.toFixed(1);
+          const d = sessionStats.lastGeneratedAt;
+          const h = String(d.getHours()).padStart(2, "0");
+          const m = String(d.getMinutes()).padStart(2, "0");
+          DOMElements.statLastGenerated.textContent = `${h}h${m}`;
+        }
+
+        DOMElements.historyList.innerHTML = "";
+        sessionStats.history.forEach((item) => {
+          const li = document.createElement("li");
+          const pwdSpan = document.createElement("span");
+          pwdSpan.className = "history-password";
+          pwdSpan.textContent = item.password;
+
+          const metaSpan = document.createElement("span");
+          metaSpan.className = "history-meta";
+          const d = item.at;
+          const h = String(d.getHours()).padStart(2, "0");
+          const m = String(d.getMinutes()).padStart(2, "0");
+          metaSpan.textContent = `${item.length}c · ${h}h${m}`;
+
+          li.appendChild(pwdSpan);
+          li.appendChild(metaSpan);
+
+          DOMElements.historyList.appendChild(li);
+        });
+      }
+
+      // Navigation mono-page
+      function setActiveSection(sectionId) {
+        DOMElements.sections.forEach((section) => {
+          const isActive = section.id === sectionId;
+          section.classList.toggle("section--active", isActive);
+        });
+
+        DOMElements.navLinks.forEach((link) => {
+          const isActive = link.dataset.section === sectionId;
+          link.classList.toggle("nav-link--active", isActive);
+          if (isActive) {
+            link.setAttribute("aria-current", "page");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+      }
+
+      DOMElements.navLinks.forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          const target = link.dataset.section;
+          if (target) {
+            setActiveSection(target);
+          }
+        });
       });
-    });
-    
-    // Écouteurs pour la mise à jour de la robustesse et des limites lors des changements de longueur
-    DOMElements.lengthSelect.addEventListener('change', () => {
+
+      // Thème persistant
+      function applyThemeFromStorage() {
+        const storedTheme = localStorage.getItem("pwgen-theme");
+        if (storedTheme === "dark") {
+          DOMElements.body.classList.add("dark");
+          DOMElements.themeToggle.textContent = "Mode clair";
+        } else {
+          DOMElements.body.classList.remove("dark");
+          DOMElements.themeToggle.textContent = "Mode sombre";
+        }
+      }
+
+      DOMElements.themeToggle.addEventListener("click", () => {
+        DOMElements.body.classList.toggle("dark");
+        const isDark = DOMElements.body.classList.contains("dark");
+        localStorage.setItem("pwgen-theme", isDark ? "dark" : "light");
+        DOMElements.themeToggle.textContent = isDark
+          ? "Mode clair"
+          : "Mode sombre";
+      });
+
+      // Gestionnaires d’événements principaux
+      DOMElements.generateBtn.addEventListener("click", () => {
+        const pwd = generatePassword();
+        DOMElements.passwordOutput.value = pwd;
+        DOMElements.toggleVisibilityBtn.textContent = "🙈";
+        updateStrengthDisplay(pwd);
+        updateSessionStats(pwd);
+        DOMElements.passwordOutput.focus();
+      });
+
+      DOMElements.copyBtn.addEventListener("click", () => {
+        const pwd = DOMElements.passwordOutput.value;
+        if (!pwd) return;
+        navigator.clipboard
+          .writeText(pwd)
+          .then(() => {
+            DOMElements.copyBtn.textContent = "Copié !";
+            setTimeout(() => {
+              DOMElements.copyBtn.textContent = "Copier 📋";
+            }, 1500);
+          })
+          .catch(() => {
+            DOMElements.errorMessage.textContent =
+              "Échec de la copie. Veuillez copier manuellement.";
+            setTimeout(() => {
+              DOMElements.errorMessage.textContent = "";
+            }, 3000);
+          });
+      });
+
+      DOMElements.toggleVisibilityBtn.addEventListener("click", () => {
+        const currentType = DOMElements.passwordOutput.type;
+        if (currentType === "password") {
+          DOMElements.passwordOutput.type = "text";
+          DOMElements.toggleVisibilityBtn.textContent = "🙈";
+        } else {
+          DOMElements.passwordOutput.type = "password";
+          DOMElements.toggleVisibilityBtn.textContent = "👁️";
+        }
+      });
+
+      DOMElements.avoidConsecutive.addEventListener("change", () => {
         adjustMinMaxLimits();
         updateStrengthDisplay();
         DOMElements.generateBtn.click();
-    });
+      });
 
-    // Générer un mot de passe au chargement et initialiser
-    window.addEventListener('load', () => {
-        charOptionInputs.forEach(item => {
-            item.number.disabled = !item.checkbox.checked;
+      const charOptionInputs = [
+        { checkbox: DOMElements.includeLower, number: DOMElements.minLower },
+        { checkbox: DOMElements.includeUpper, number: DOMElements.minUpper },
+        { checkbox: DOMElements.includeDigits, number: DOMElements.minDigits },
+        {
+          checkbox: DOMElements.includeSpecial,
+          number: DOMElements.minSpecial,
+        },
+      ];
+
+      charOptionInputs.forEach((item) => {
+        item.number.disabled = !item.checkbox.checked;
+
+        item.checkbox.addEventListener("change", () => {
+          item.number.disabled = !item.checkbox.checked;
+          if (!item.checkbox.checked) {
+            item.number.value = "0";
+          } else if (
+            parseInt(item.number.value, 10) === 0 ||
+            item.number.value === ""
+          ) {
+            item.number.value = "1";
+          }
+          adjustMinMaxLimits();
+          updateStrengthDisplay();
+          DOMElements.generateBtn.click();
+        });
+
+        item.number.addEventListener("input", () => {
+          if (parseInt(item.number.value, 10) === 0) {
+            item.checkbox.checked = false;
+            item.number.disabled = true;
+          } else {
+            item.checkbox.checked = true;
+            item.number.disabled = false;
+          }
+          adjustMinMaxLimits();
+          updateStrengthDisplay();
+          DOMElements.generateBtn.click();
+        });
+      });
+
+      DOMElements.lengthSelect.addEventListener("change", () => {
+        adjustMinMaxLimits();
+        updateStrengthDisplay();
+        DOMElements.generateBtn.click();
+      });
+
+      // Initialisation
+      window.addEventListener("load", () => {
+        applyThemeFromStorage();
+
+        charOptionInputs.forEach((item) => {
+          item.number.disabled = !item.checkbox.checked;
         });
 
         DOMElements.includeLower.checked = true;
         DOMElements.includeUpper.checked = true;
         DOMElements.includeDigits.checked = true;
         DOMElements.includeSpecial.checked = true;
-        DOMElements.minLower.value = '3';
-        DOMElements.minUpper.value = '3';
-        DOMElements.minDigits.value = '3';
-        DOMElements.minSpecial.value = '5';
+        DOMElements.minLower.value = "3";
+        DOMElements.minUpper.value = "3";
+        DOMElements.minDigits.value = "3";
+        DOMElements.minSpecial.value = "5";
+        DOMElements.lengthSelect.value = "20";
 
-        DOMElements.lengthSelect.value = '20'; 
+        DOMElements.passwordOutput.type = "text";
+        DOMElements.toggleVisibilityBtn.textContent = "🙈";
 
-        DOMElements.passwordOutput.type = 'text'; 
-        DOMElements.toggleVisibilityBtn.textContent = '🙈';
-        
         adjustMinMaxLimits();
+        renderDashboard();
         DOMElements.generateBtn.click();
-    });
-  </script>
-</body>
+      });
+    </script>
+  </body>
 </html>
