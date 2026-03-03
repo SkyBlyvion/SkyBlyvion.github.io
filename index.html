@@ -2,9 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Générateur de mot de passe sécurisé</title>
     <style>
       :root {
@@ -212,6 +210,7 @@
 
       select,
       input[type="text"],
+      input[type="password"],
       input[type="number"] {
         width: 100%;
         padding: 0.45rem 0.6rem;
@@ -224,6 +223,7 @@
 
       body.dark select,
       body.dark input[type="text"],
+      body.dark input[type="password"],
       body.dark input[type="number"] {
         background: #444;
         border-color: #555;
@@ -432,26 +432,25 @@
             </div>
           </div>
           <nav>
+            <button class="nav-link" data-section="section-converter">
+              Convertisseur
+            </button>
+            <button class="nav-link" data-section="section-ipcalc">
+              Calculateur IP
+            </button>
             <button
               class="nav-link nav-link--active"
               data-section="section-generator"
               aria-current="page">
               Générateur
             </button>
-            <button
-              class="nav-link"
-              data-section="section-dashboard">
+            <button class="nav-link" data-section="section-dashboard">
               Tableau de bord
             </button>
-            <button
-              class="nav-link"
-              data-section="section-help">
+            <button class="nav-link" data-section="section-help">
               Aide
             </button>
-            <button
-              id="themeToggle"
-              class="theme-toggle-btn"
-              type="button">
+            <button id="themeToggle" class="theme-toggle-btn" type="button">
               Mode sombre
             </button>
           </nav>
@@ -460,9 +459,7 @@
 
       <main>
         <!-- SECTION GENERATEUR -->
-        <section
-          id="section-generator"
-          class="section section--active">
+        <section id="section-generator" class="section section--active">
           <h2 class="section-title">Générateur de mot de passe</h2>
           <div class="card generator-card">
             <div class="controls">
@@ -482,10 +479,7 @@
 
               <div class="char-option">
                 <label>
-                  <input
-                    type="checkbox"
-                    id="includeLower"
-                    checked />
+                  <input type="checkbox" id="includeLower" checked />
                   Minuscules (a-z)
                 </label>
                 <div class="min-input-group">
@@ -501,10 +495,7 @@
 
               <div class="char-option">
                 <label>
-                  <input
-                    type="checkbox"
-                    id="includeUpper"
-                    checked />
+                  <input type="checkbox" id="includeUpper" checked />
                   Majuscules (A-Z)
                 </label>
                 <div class="min-input-group">
@@ -520,10 +511,7 @@
 
               <div class="char-option">
                 <label>
-                  <input
-                    type="checkbox"
-                    id="includeDigits"
-                    checked />
+                  <input type="checkbox" id="includeDigits" checked />
                   Chiffres (0-9)
                 </label>
                 <div class="min-input-group">
@@ -539,10 +527,7 @@
 
               <div class="char-option">
                 <label>
-                  <input
-                    type="checkbox"
-                    id="includeSpecial"
-                    checked />
+                  <input type="checkbox" id="includeSpecial" checked />
                   Caractères spéciaux (%$!@#^&*)
                 </label>
                 <div class="min-input-group">
@@ -557,10 +542,7 @@
               </div>
 
               <label>
-                <input
-                  type="checkbox"
-                  id="avoidConsecutive"
-                  checked />
+                <input type="checkbox" id="avoidConsecutive" checked />
                 Interdire deux caractères identiques à la suite
               </label>
 
@@ -569,20 +551,15 @@
                 tous types inclus.
               </p>
 
-              <button
-                id="generateBtn"
-                class="btn-primary"
-                type="button">
+              <button id="generateBtn" class="btn-primary" type="button">
                 Générer
               </button>
 
-              <div
-                id="errorMessage"
-                class="error-message"></div>
+              <div id="errorMessage" class="error-message"></div>
 
               <div class="password-output-group">
                 <input
-                  type="text"
+                  type="password"
                   id="passwordOutput"
                   readonly
                   placeholder="Votre mot de passe" />
@@ -591,28 +568,21 @@
                   class="btn-ghost"
                   type="button"
                   title="Afficher/Masquer le mot de passe">
-                  🙈
+                  Afficher
                 </button>
               </div>
 
-              <button
-                id="copyBtn"
-                class="btn-primary"
-                type="button">
-                Copier 📋
+              <button id="copyBtn" class="btn-primary" type="button">
+                Copier
               </button>
 
-              <div
-                id="strengthDisplay"
-                class="strength">
+              <div id="strengthDisplay" class="strength">
                 <div class="strength-bar">
                   <div
                     id="strengthIndicator"
                     class="strength-indicator"></div>
                 </div>
-                <div
-                  id="strengthText"
-                  class="strength-text">
+                <div id="strengthText" class="strength-text">
                   Robustesse : Non évaluée
                 </div>
               </div>
@@ -620,10 +590,123 @@
           </div>
         </section>
 
+        <!-- SECTION CALCULATEUR IP -->
+        <section id="section-ipcalc" class="section">
+          <h2
+            class="section-title"
+            style="display: flex; align-items: center; gap: 0.5rem">
+            Calculateur d'adresse IP
+          </h2>
+          <div
+            class="card"
+            style="
+              max-width: 1000px;
+              margin: 0 auto;
+              box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+              padding: 2.5rem 2rem;
+            ">
+            <form
+              id="ipCalcForm"
+              autocomplete="off"
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1.5rem;
+                align-items: flex-end;
+                justify-content: flex-start;
+              ">
+              <label style="flex: 1 1 220px; min-width: 220px">
+                Adresse IP :
+                <input
+                  type="text"
+                  id="ipInput"
+                  placeholder="192.168.1.1"
+                  required
+                  pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                  style="
+                    width: 100%;
+                    font-size: 1.1em;
+                    padding: 0.7em 1em;
+                    border-radius: 0.6em;
+                    border: 1px solid #bbb;
+                  " />
+              </label>
+              <button
+                type="submit"
+                class="btn-primary"
+                style="font-size: 1.1em; padding: 0.7em 2em; min-width: 160px">
+                Calculer tous les masques
+              </button>
+            </form>
+            <div
+              id="ipCalcResult"
+              style="
+                margin-top: 2.5rem;
+                overflow-x: auto;
+                max-width: 100%;
+                font-size: 1em;
+              "></div>
+          </div>
+        </section>
+
+        <!-- SECTION CONVERTISSEUR -->
+        <section id="section-converter" class="section">
+          <h2
+            class="section-title"
+            style="display: flex; align-items: center; gap: 0.5rem">
+            Convertisseur Décimal
+          </h2>
+          <div
+            class="card"
+            style="
+              max-width: 480px;
+              margin: 0 auto;
+              box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+              padding: 2.5rem 2rem;
+            ">
+            <form
+              id="converterForm"
+              autocomplete="off"
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1.5rem;
+                align-items: flex-end;
+                justify-content: flex-start;
+              ">
+              <label style="flex: 1 1 220px; min-width: 220px">
+                Valeur décimale :
+                <input
+                  type="number"
+                  id="decimalInput"
+                  placeholder="65"
+                  min="0"
+                  max="255"
+                  required
+                  style="
+                    width: 100%;
+                    font-size: 1.1em;
+                    padding: 0.7em 1em;
+                    border-radius: 0.6em;
+                    border: 1px solid #bbb;
+                  " />
+              </label>
+              <button
+                type="submit"
+                id="convertBtn"
+                class="btn-primary"
+                style="font-size: 1.1em; padding: 0.7em 2em; min-width: 160px">
+                Convertir
+              </button>
+            </form>
+            <div
+              id="converterResult"
+              style="margin-top: 2.5rem; font-size: 1.1em"></div>
+          </div>
+        </section>
+
         <!-- SECTION TABLEAU DE BORD -->
-        <section
-          id="section-dashboard"
-          class="section">
+        <section id="section-dashboard" class="section">
           <h2 class="section-title">Tableau de bord</h2>
           <div class="card">
             <p style="font-size: 0.9rem; margin-top: 0; margin-bottom: 0.75rem">
@@ -633,49 +716,32 @@
             <div class="dashboard-grid">
               <div>
                 <div class="stat-value" id="statCount">0</div>
-                <div class="stat-label">
-                  Mots de passe générés (session)
-                </div>
+                <div class="stat-label">Mots de passe générés (session)</div>
               </div>
               <div>
-                <div
-                  class="stat-value"
-                  id="statAvgLength">
-                  0
-                </div>
-                <div class="stat-label">
-                  Longueur moyenne
-                </div>
+                <div class="stat-value" id="statAvgLength">0</div>
+                <div class="stat-label">Longueur moyenne</div>
               </div>
               <div>
-                <div
-                  class="stat-value"
-                  id="statLastGenerated">
-                  —
-                </div>
-                <div class="stat-label">
-                  Dernière génération
-                </div>
+                <div class="stat-value" id="statLastGenerated">—</div>
+                <div class="stat-label">Dernière génération</div>
               </div>
             </div>
 
-            <h3 style="margin-top: 1.25rem; font-size: 1rem; margin-bottom: 0.35rem">
+            <h3
+              style="margin-top: 1.25rem; font-size: 1rem; margin-bottom: 0.35rem">
               Historique des derniers mots de passe
             </h3>
             <p style="margin-top: 0; font-size: 0.8rem; opacity: 0.8">
               Maximum 10 entrées, stockées uniquement en mémoire (elles
               disparaîtront au rechargement de la page).
             </p>
-            <ul
-              id="historyList"
-              class="history-list"></ul>
+            <ul id="historyList" class="history-list"></ul>
           </div>
         </section>
 
         <!-- SECTION AIDE -->
-        <section
-          id="section-help"
-          class="section">
+        <section id="section-help" class="section">
           <h2 class="section-title">Aide et bonnes pratiques</h2>
           <div class="card">
             <p style="margin-top: 0; font-size: 0.95rem">
@@ -684,12 +750,10 @@
             </p>
             <ul class="help-list">
               <li>
-                Utilisez un
-                <strong>mot de passe différent pour chaque service</strong>.
+                Utilisez un <strong>mot de passe différent pour chaque service</strong>.
               </li>
               <li>
-                Privilégiez une
-                <strong>longueur ≥ 16–20 caractères</strong> avec tous les
+                Privilégiez une <strong>longueur ≥ 16–20 caractères</strong> avec tous les
                 types activés.
               </li>
               <li>
@@ -697,8 +761,7 @@
                 texte synchronisé sans chiffrement.
               </li>
               <li>
-                Idéalement,
-                <strong>combinez ce générateur avec un coffre-fort</strong>
+                Idéalement, <strong>combinez ce générateur avec un coffre-fort</strong>
                 chiffré (KeePass, fichiers KDBX, etc.).
               </li>
               <li>
@@ -726,586 +789,809 @@
     </div>
 
     <script>
-      // Centralisation des éléments DOM
-      const DOMElements = {
-        lengthSelect: document.getElementById("lengthSelect"),
-        includeLower: document.getElementById("includeLower"),
-        minLower: document.getElementById("minLower"),
-        includeUpper: document.getElementById("includeUpper"),
-        minUpper: document.getElementById("minUpper"),
-        includeDigits: document.getElementById("includeDigits"),
-        minDigits: document.getElementById("minDigits"),
-        includeSpecial: document.getElementById("includeSpecial"),
-        minSpecial: document.getElementById("minSpecial"),
-        generateBtn: document.getElementById("generateBtn"),
-        passwordOutput: document.getElementById("passwordOutput"),
-        toggleVisibilityBtn: document.getElementById("toggleVisibilityBtn"),
-        copyBtn: document.getElementById("copyBtn"),
-        strengthText: document.getElementById("strengthText"),
-        strengthIndicator: document.getElementById("strengthIndicator"),
-        strengthDisplay: document.getElementById("strengthDisplay"),
-        themeToggle: document.getElementById("themeToggle"),
-        body: document.body,
-        errorMessage: document.getElementById("errorMessage"),
-        avoidConsecutive: document.getElementById("avoidConsecutive"),
-        navLinks: document.querySelectorAll(".nav-link[data-section]"),
-        sections: document.querySelectorAll(".section"),
-        statCount: document.getElementById("statCount"),
-        statAvgLength: document.getElementById("statAvgLength"),
-        statLastGenerated: document.getElementById("statLastGenerated"),
-        historyList: document.getElementById("historyList"),
-      };
+      (() => {
+        "use strict";
 
-      // Jeu de caractères de base
-      const BASE_CHAR_SETS = {
-        lower: "abcdefghijklmnopqrstuvwxyz",
-        upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-        digits: "0123456789",
-        special: "%$!@#^&*",
-      };
+        /** @param {string} id */
+        const $id = (id) => /** @type {HTMLElement|null} */ (document.getElementById(id));
 
-      // Statistiques de la session
-      const sessionStats = {
-        count: 0,
-        totalLength: 0,
-        lastGeneratedAt: null,
-        history: [],
-        historyLimit: 10,
-      };
+        /** @param {string} sel */
+        const $ = (sel) => /** @type {HTMLElement|null} */ (document.querySelector(sel));
 
-      // Utils RNG
-      function randIndex(maxExclusive) {
-        return crypto.getRandomValues(new Uint32Array(1))[0] % maxExclusive;
-      }
+        /** @param {string} sel */
+        const $$ = (sel) => /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(sel));
 
-      function getRandomCharFromSet(setStr, excludeSet = new Set()) {
-        if (!setStr || setStr.length === 0) return "";
-        for (let tries = 0; tries < 32; tries++) {
-          const c = setStr.charAt(randIndex(setStr.length));
-          if (!excludeSet.has(c)) return c;
-        }
-        for (let i = 0; i < setStr.length; i++) {
-          const c = setStr.charAt(i);
-          if (!excludeSet.has(c)) return c;
-        }
-        return "";
-      }
+        const DOM = {
+          body: document.body,
 
-      function charTypeOf(ch) {
-        if (BASE_CHAR_SETS.lower.includes(ch)) return "lower";
-        if (BASE_CHAR_SETS.upper.includes(ch)) return "upper";
-        if (BASE_CHAR_SETS.digits.includes(ch)) return "digits";
-        if (BASE_CHAR_SETS.special.includes(ch)) return "special";
-        return null;
-      }
+          // Navigation / sections
+          navLinks: $$("nav .nav-link[data-section]"),
+          sections: $$(".section"),
 
-      function countTypes(arr) {
-        const map = { lower: 0, upper: 0, digits: 0, special: 0 };
-        for (const c of arr) {
-          const t = charTypeOf(c);
-          if (t) map[t]++;
-        }
-        return map;
-      }
+          // Theme
+          themeToggle: /** @type {HTMLButtonElement} */ ($id("themeToggle")),
 
-      // Corrige les doublons consécutifs en respectant les min par type
-      function enforceNoConsecutiveDuplicates(pwdArray, allCharsPool, minMap) {
-        const out = pwdArray.slice();
-        const counts = countTypes(out);
+          // Generator
+          lengthSelect: /** @type {HTMLSelectElement} */ ($id("lengthSelect")),
+          includeLower: /** @type {HTMLInputElement} */ ($id("includeLower")),
+          minLower: /** @type {HTMLInputElement} */ ($id("minLower")),
+          includeUpper: /** @type {HTMLInputElement} */ ($id("includeUpper")),
+          minUpper: /** @type {HTMLInputElement} */ ($id("minUpper")),
+          includeDigits: /** @type {HTMLInputElement} */ ($id("includeDigits")),
+          minDigits: /** @type {HTMLInputElement} */ ($id("minDigits")),
+          includeSpecial: /** @type {HTMLInputElement} */ ($id("includeSpecial")),
+          minSpecial: /** @type {HTMLInputElement} */ ($id("minSpecial")),
+          avoidConsecutive: /** @type {HTMLInputElement} */ ($id("avoidConsecutive")),
+          generateBtn: /** @type {HTMLButtonElement} */ ($id("generateBtn")),
+          passwordOutput: /** @type {HTMLInputElement} */ ($id("passwordOutput")),
+          toggleVisibilityBtn: /** @type {HTMLButtonElement} */ ($id("toggleVisibilityBtn")),
+          copyBtn: /** @type {HTMLButtonElement} */ ($id("copyBtn")),
+          errorMessage: /** @type {HTMLDivElement} */ ($id("errorMessage")),
+          strengthText: /** @type {HTMLDivElement} */ ($id("strengthText")),
+          strengthIndicator: /** @type {HTMLDivElement} */ ($id("strengthIndicator")),
 
-        const uniquePool = Array.from(new Set(allCharsPool.split("")));
-        if (uniquePool.length <= 1 && out.length > 1) {
-          DOMElements.errorMessage.textContent =
-            "Impossible d’éviter les doublons consécutifs avec un pool d’un seul caractère.";
-          return out;
-        }
+          // Dashboard
+          statCount: /** @type {HTMLDivElement} */ ($id("statCount")),
+          statAvgLength: /** @type {HTMLDivElement} */ ($id("statAvgLength")),
+          statLastGenerated: /** @type {HTMLDivElement} */ ($id("statLastGenerated")),
+          historyList: /** @type {HTMLUListElement} */ ($id("historyList")),
 
-        for (let i = 1; i < out.length; i++) {
-          if (out[i] === out[i - 1]) {
-            const original = out[i];
-            const originalType = charTypeOf(original);
-            const exclude = new Set([out[i - 1]]);
-            if (i + 1 < out.length) exclude.add(out[i + 1]);
+          // Converter
+          converterForm: /** @type {HTMLFormElement} */ ($id("converterForm")),
+          decimalInput: /** @type {HTMLInputElement} */ ($id("decimalInput")),
+          converterResult: /** @type {HTMLDivElement} */ ($id("converterResult")),
+
+          // IP Calc
+          ipCalcForm: /** @type {HTMLFormElement} */ ($id("ipCalcForm")),
+          ipInput: /** @type {HTMLInputElement} */ ($id("ipInput")),
+          ipCalcResult: /** @type {HTMLDivElement} */ ($id("ipCalcResult")),
+        };
+
+        const STORAGE_KEYS = {
+          theme: "pwgen-theme",
+        };
+
+        const CHAR_SETS = Object.freeze({
+          lower: "abcdefghijklmnopqrstuvwxyz",
+          upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+          digits: "0123456789",
+          special: "%$!@#^&*",
+        });
+
+        /** @type {{count:number; totalLength:number; lastGeneratedAt: Date|null; history: {password:string; length:number; at:Date}[]; historyLimit:number}} */
+        const sessionStats = {
+          count: 0,
+          totalLength: 0,
+          lastGeneratedAt: null,
+          history: [],
+          historyLimit: 10,
+        };
+
+        // -----------------------
+        // Utils
+        // -----------------------
+        /** @param {number} n */
+        const clampInt = (n, min, max) => {
+          const v = Number.isFinite(n) ? Math.trunc(n) : min;
+          return Math.max(min, Math.min(max, v));
+        };
+
+        /** @param {Date} d */
+        const formatHHMM = (d) =>
+          `${String(d.getHours()).padStart(2, "0")}h${String(d.getMinutes()).padStart(2, "0")}`;
+
+        /** CSPRNG index in [0, maxExclusive) */
+        const randIndex = (maxExclusive) => {
+          const max = Math.max(1, Math.trunc(maxExclusive));
+          return crypto.getRandomValues(new Uint32Array(1))[0] % max;
+        };
+
+        /** @param {string[]} arr */
+        const shuffleInPlace = (arr) => {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = randIndex(i + 1);
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
+        };
+
+        /** @param {string} s */
+        const isValidIPv4 = (s) => {
+          const parts = s.split(".");
+          if (parts.length !== 4) return false;
+          for (const p of parts) {
+            if (!/^\d{1,3}$/.test(p)) return false;
+            const n = Number(p);
+            if (!Number.isInteger(n) || n < 0 || n > 255) return false;
+          }
+          return true;
+        };
+
+        /** @param {string} ip */
+        const ipToU32 = (ip) => {
+          const [a, b, c, d] = ip.split(".").map((x) => Number(x));
+          return (((a << 24) | (b << 16) | (c << 8) | d) >>> 0);
+        };
+
+        /** @param {number} u32 */
+        const u32ToIp = (u32) => {
+          const n = u32 >>> 0;
+          return [
+            (n >>> 24) & 255,
+            (n >>> 16) & 255,
+            (n >>> 8) & 255,
+            n & 255,
+          ].join(".");
+        };
+
+        /** @param {number} bits */
+        const maskBitsToU32 = (bits) => {
+          const b = clampInt(bits, 0, 32);
+          if (b === 0) return 0 >>> 0;
+          return (0xFFFFFFFF << (32 - b)) >>> 0;
+        };
+
+        /** @param {number} bits */
+        const maskBitsToDotted = (bits) => u32ToIp(maskBitsToU32(bits));
+
+        /** @param {number} dec */
+        const decimalToBinary8 = (dec) => {
+          const n = Number(dec);
+          if (!Number.isFinite(n) || n < 0 || n > 255) return "";
+          return n.toString(2).padStart(8, "0");
+        };
+
+        const setError = (msg) => {
+          DOM.errorMessage.textContent = msg ?? "";
+        };
+
+        /** @param {string} s */
+        const escapeHtml = (s) =>
+          s.replace(/[&<>"']/g, (c) => {
+            switch (c) {
+              case "&":
+                return "&amp;";
+              case "<":
+                return "&lt;";
+              case ">":
+                return "&gt;";
+              case '"':
+                return "&quot;";
+              case "'":
+                return "&#039;";
+              default:
+                return c;
+            }
+          });
+
+        // -----------------------
+        // Navigation (SPA)
+        // -----------------------
+        const setActiveSection = (sectionId) => {
+          DOM.sections.forEach((section) => {
+            section.classList.toggle("section--active", section.id === sectionId);
+          });
+
+          DOM.navLinks.forEach((btn) => {
+            const isActive = btn.dataset.section === sectionId;
+            btn.classList.toggle("nav-link--active", isActive);
+            if (isActive) btn.setAttribute("aria-current", "page");
+            else btn.removeAttribute("aria-current");
+          });
+        };
+
+        // -----------------------
+        // Theme
+        // -----------------------
+        const applyThemeFromStorage = () => {
+          const stored = localStorage.getItem(STORAGE_KEYS.theme);
+          const isDark = stored === "dark";
+          DOM.body.classList.toggle("dark", isDark);
+          DOM.themeToggle.textContent = isDark ? "Mode clair" : "Mode sombre";
+        };
+
+        const toggleTheme = () => {
+          const isDark = !DOM.body.classList.contains("dark");
+          DOM.body.classList.toggle("dark", isDark);
+          localStorage.setItem(STORAGE_KEYS.theme, isDark ? "dark" : "light");
+          DOM.themeToggle.textContent = isDark ? "Mode clair" : "Mode sombre";
+        };
+
+        // -----------------------
+        // Password Generator
+        // -----------------------
+        const getConfig = () => {
+          const length = clampInt(parseInt(DOM.lengthSelect.value, 10), 1, 50);
+          const avoidConsecutive = DOM.avoidConsecutive.checked;
+
+          /** @type {{type: "lower"|"upper"|"digits"|"special"; chars:string; minCount:number}[]} */
+          const reqs = [];
+
+          const pushIfEnabled = (type, enabled, minEl) => {
+            if (!enabled) return;
+            const minCount = clampInt(parseInt(minEl.value, 10) || 0, 0, 50);
+            reqs.push({ type, chars: CHAR_SETS[type], minCount });
+          };
+
+          pushIfEnabled("lower", DOM.includeLower.checked, DOM.minLower);
+          pushIfEnabled("upper", DOM.includeUpper.checked, DOM.minUpper);
+          pushIfEnabled("digits", DOM.includeDigits.checked, DOM.minDigits);
+          pushIfEnabled("special", DOM.includeSpecial.checked, DOM.minSpecial);
+
+          const pool = reqs.map((r) => r.chars).join("");
+          const minSum = reqs.reduce((acc, r) => acc + r.minCount, 0);
+
+          return { length, avoidConsecutive, reqs, pool, minSum };
+        };
+
+        /** @param {string} pool */
+        const pickChar = (pool, exclude) => {
+          if (!pool) return "";
+          const excludeSet = exclude ? new Set(exclude) : new Set();
+          for (let tries = 0; tries < 32; tries++) {
+            const c = pool.charAt(randIndex(pool.length));
+            if (!excludeSet.has(c)) return c;
+          }
+          for (let i = 0; i < pool.length; i++) {
+            const c = pool.charAt(i);
+            if (!excludeSet.has(c)) return c;
+          }
+          return "";
+        };
+
+        const enforceNoConsecutiveDuplicates = (chars, pool, minMap) => {
+          const out = chars.slice();
+
+          const typeOf = (ch) => {
+            if (CHAR_SETS.lower.includes(ch)) return "lower";
+            if (CHAR_SETS.upper.includes(ch)) return "upper";
+            if (CHAR_SETS.digits.includes(ch)) return "digits";
+            if (CHAR_SETS.special.includes(ch)) return "special";
+            return null;
+          };
+
+          /** @type {{lower:number;upper:number;digits:number;special:number}} */
+          const counts = { lower: 0, upper: 0, digits: 0, special: 0 };
+          for (const c of out) {
+            const t = typeOf(c);
+            if (t) counts[t]++;
+          }
+
+          const uniquePool = Array.from(new Set(pool.split("")));
+          if (uniquePool.length <= 1 && out.length > 1) {
+            setError("Impossible d’éviter les doublons consécutifs avec un pool d’un seul caractère.");
+            return out;
+          }
+
+          for (let i = 1; i < out.length; i++) {
+            if (out[i] !== out[i - 1]) continue;
+
+            const prev = out[i - 1];
+            const next = i + 1 < out.length ? out[i + 1] : "";
+            const exclude = new Set([prev, next].filter(Boolean));
+
+            const current = out[i];
+            const currentType = typeOf(current);
 
             let replacement = "";
-            if (originalType && counts[originalType] <= (minMap[originalType] || 0)) {
-              replacement = getRandomCharFromSet(BASE_CHAR_SETS[originalType], exclude);
-              if (!replacement) {
-                replacement = getRandomCharFromSet(allCharsPool, exclude);
-                const newType = charTypeOf(replacement);
-                if (newType && newType !== originalType) {
-                  counts[originalType] = Math.max(0, counts[originalType] - 1);
-                  counts[newType] = (counts[newType] || 0) + 1;
-                }
-              }
+            if (currentType && counts[currentType] <= (minMap[currentType] || 0)) {
+              replacement = pickChar(CHAR_SETS[currentType], exclude);
+              if (!replacement) replacement = pickChar(pool, exclude);
             } else {
-              replacement = getRandomCharFromSet(allCharsPool, exclude);
-              const newType = charTypeOf(replacement);
-              if (originalType && newType && newType !== originalType) {
-                counts[originalType] = Math.max(0, counts[originalType] - 1);
-                counts[newType] = (counts[newType] || 0) + 1;
-              }
+              replacement = pickChar(pool, exclude);
             }
 
             if (!replacement) {
-              replacement =
-                uniquePool.find((c) => c !== out[i - 1]) ||
-                out[i];
+              replacement = uniquePool.find((c) => c !== prev) || current;
+            }
+
+            const newType = typeOf(replacement);
+            if (currentType && newType && currentType !== newType) {
+              counts[currentType] = Math.max(0, counts[currentType] - 1);
+              counts[newType] = (counts[newType] || 0) + 1;
             }
 
             out[i] = replacement;
           }
-        }
-        return out;
-      }
 
-      // Génération
-      function generatePassword() {
-        DOMElements.errorMessage.textContent = "";
-        const length = parseInt(DOMElements.lengthSelect.value, 10);
-        const avoidConsecutive = DOMElements.avoidConsecutive.checked;
+          return out;
+        };
 
-        let characterRequirements = [];
-        let totalGuaranteedCount = 0;
-        let allCharsPool = "";
+        const generatePassword = () => {
+          setError("");
 
-        if (DOMElements.includeLower.checked) {
-          const count = parseInt(DOMElements.minLower.value, 10) || 0;
-          characterRequirements.push({
-            type: "lower",
-            chars: BASE_CHAR_SETS.lower,
-            minCount: count,
-          });
-          totalGuaranteedCount += count;
-          allCharsPool += BASE_CHAR_SETS.lower;
-        }
-        if (DOMElements.includeUpper.checked) {
-          const count = parseInt(DOMElements.minUpper.value, 10) || 0;
-          characterRequirements.push({
-            type: "upper",
-            chars: BASE_CHAR_SETS.upper,
-            minCount: count,
-          });
-          totalGuaranteedCount += count;
-          allCharsPool += BASE_CHAR_SETS.upper;
-        }
-        if (DOMElements.includeDigits.checked) {
-          const count = parseInt(DOMElements.minDigits.value, 10) || 0;
-          characterRequirements.push({
-            type: "digits",
-            chars: BASE_CHAR_SETS.digits,
-            minCount: count,
-          });
-          totalGuaranteedCount += count;
-          allCharsPool += BASE_CHAR_SETS.digits;
-        }
-        if (DOMElements.includeSpecial.checked) {
-          const count = parseInt(DOMElements.minSpecial.value, 10) || 0;
-          characterRequirements.push({
-            type: "special",
-            chars: BASE_CHAR_SETS.special,
-            minCount: count,
-          });
-          totalGuaranteedCount += count;
-          allCharsPool += BASE_CHAR_SETS.special;
-        }
+          const { length, avoidConsecutive, reqs, pool, minSum } = getConfig();
 
-        if (characterRequirements.length === 0) {
-          DOMElements.errorMessage.textContent =
-            "Veuillez sélectionner au moins un type de caractères.";
-          return "";
-        }
+          if (reqs.length === 0) {
+            setError("Veuillez sélectionner au moins un type de caractères.");
+            return "";
+          }
+          if (minSum > length) {
+            setError(`Le nombre minimum requis (${minSum}) dépasse la longueur totale (${length}).`);
+            return "";
+          }
+          if (!pool) {
+            setError("Aucun type de caractère n'a été sélectionné pour générer le mot de passe.");
+            return "";
+          }
 
-        if (totalGuaranteedCount > length) {
-          DOMElements.errorMessage.textContent = `Le nombre minimum de caractères requis (${totalGuaranteedCount}) dépasse la longueur totale (${length}). Veuillez ajuster.`;
-          return "";
-        }
+          /** @type {string[]} */
+          const chars = [];
 
-        if (allCharsPool.length === 0 && length > 0) {
-          DOMElements.errorMessage.textContent =
-            "Aucun type de caractère n'a été sélectionné pour générer le mot de passe.";
-          return "";
-        }
-
-        let pwdArray = [];
-
-        characterRequirements.forEach((req) => {
-          for (let i = 0; i < req.minCount; i++) {
-            let c = req.chars.charAt(randIndex(req.chars.length));
-            if (avoidConsecutive && pwdArray.length > 0) {
-              const exclude = new Set([pwdArray[pwdArray.length - 1]]);
-              c = getRandomCharFromSet(req.chars, exclude);
+          for (const r of reqs) {
+            for (let i = 0; i < r.minCount; i++) {
+              const prev = chars.length > 0 ? chars[chars.length - 1] : "";
+              const c = avoidConsecutive ? pickChar(r.chars, [prev]) : pickChar(r.chars);
+              chars.push(c || r.chars.charAt(randIndex(r.chars.length)));
             }
-            pwdArray.push(c);
           }
-        });
 
-        const remainingLength = length - pwdArray.length;
-        for (let i = 0; i < remainingLength; i++) {
-          let c = allCharsPool.charAt(randIndex(allCharsPool.length));
-          if (avoidConsecutive && pwdArray.length > 0) {
-            const exclude = new Set([pwdArray[pwdArray.length - 1]]);
-            c = getRandomCharFromSet(allCharsPool, exclude);
+          while (chars.length < length) {
+            const prev = chars.length > 0 ? chars[chars.length - 1] : "";
+            const c = avoidConsecutive ? pickChar(pool, [prev]) : pickChar(pool);
+            chars.push(c || pool.charAt(randIndex(pool.length)));
           }
-          pwdArray.push(c);
-        }
 
-        const shuffled = shuffleArray(pwdArray);
+          shuffleInPlace(chars);
 
-        if (avoidConsecutive) {
-          const minMap = { lower: 0, upper: 0, digits: 0, special: 0 };
-          characterRequirements.forEach((r) => {
-            minMap[r.type] = r.minCount;
+          if (avoidConsecutive) {
+            /** @type {{lower:number;upper:number;digits:number;special:number}} */
+            const minMap = { lower: 0, upper: 0, digits: 0, special: 0 };
+            for (const r of reqs) minMap[r.type] = r.minCount;
+            return enforceNoConsecutiveDuplicates(chars, pool, minMap).join("");
+          }
+
+          return chars.join("");
+        };
+
+        const evaluateStrength = (pwd) => {
+          if (!pwd) return { label: "Non évaluée", level: 0 };
+
+          const len = pwd.length;
+          const hasLower = /[a-z]/.test(pwd);
+          const hasUpper = /[A-Z]/.test(pwd);
+          const hasDigits = /[0-9]/.test(pwd);
+          const hasSpecial = /[%\$!@#\^&\*]/.test(pwd);
+
+          const types = [hasLower, hasUpper, hasDigits, hasSpecial].filter(Boolean).length;
+
+          let score = 0;
+          score += Math.min(60, len * 3);
+          score += types * 10;
+          score = clampInt(score, 0, 100);
+
+          const level = score / 100;
+
+          let label = "Faible";
+          if (level >= 0.75) label = "Très fort";
+          else if (level >= 0.5) label = "Fort";
+          else if (level >= 0.25) label = "Moyen";
+
+          return { label, level };
+        };
+
+        const updateStrengthDisplay = (pwd) => {
+          const { label, level } = evaluateStrength(pwd);
+          DOM.strengthText.textContent = `Robustesse : ${label}`;
+
+          DOM.strengthIndicator.style.width = `${Math.round(level * 100)}%`;
+          if (level < 0.25) DOM.strengthIndicator.style.backgroundColor = "var(--strength-weak)";
+          else if (level < 0.5) DOM.strengthIndicator.style.backgroundColor = "var(--strength-medium)";
+          else if (level < 0.75) DOM.strengthIndicator.style.backgroundColor = "var(--strength-strong)";
+          else DOM.strengthIndicator.style.backgroundColor = "var(--strength-very-strong)";
+        };
+
+        const updateSessionStats = (pwd) => {
+          if (!pwd) return;
+
+          sessionStats.count += 1;
+          sessionStats.totalLength += pwd.length;
+          sessionStats.lastGeneratedAt = new Date();
+
+          sessionStats.history.unshift({
+            password: pwd,
+            length: pwd.length,
+            at: sessionStats.lastGeneratedAt,
           });
-          const fixed = enforceNoConsecutiveDuplicates(
-            shuffled,
-            allCharsPool,
-            minMap,
-          );
-          return fixed.join("");
-        }
-
-        return shuffled.join("");
-      }
-
-      function shuffleArray(arr) {
-        const a = arr.slice();
-        for (let i = a.length - 1; i > 0; i--) {
-          const j = randIndex(i + 1);
-          [a[i], a[j]] = [a[j], a[i]];
-        }
-        return a;
-      }
-
-      // Évaluation de la robustesse
-      function evaluateStrength(pwd) {
-        if (!pwd) {
-          return { text: "Non évaluée", score: 0 };
-        }
-
-        let score = 0;
-        const length = pwd.length;
-
-        score += Math.log2(length) * 5;
-
-        let typesCount = 0;
-        if (/[a-z]/.test(pwd)) typesCount++;
-        if (/[A-Z]/.test(pwd)) typesCount++;
-        if (/[0-9]/.test(pwd)) typesCount++;
-        if (/[%\$!@#\^&\*]/.test(pwd)) typesCount++;
-
-        score += typesCount * 10;
-
-        score += (pwd.match(/[a-z]/g) || []).length * 0.5;
-        score += (pwd.match(/[A-Z]/g) || []).length * 0.7;
-        score += (pwd.match(/[0-9]/g) || []).length * 0.6;
-        score += (pwd.match(/[%\$!@#\^&\*]/g) || []).length * 0.8;
-
-        const maxScore = 100;
-        score = Math.max(0, Math.min(score, maxScore));
-
-        let strengthText = "";
-        const strengthLevel = score / maxScore;
-
-        if (strengthLevel < 0.25) {
-          strengthText = "Faible";
-          DOMElements.strengthIndicator.style.backgroundColor =
-            "var(--strength-weak)";
-        } else if (strengthLevel < 0.5) {
-          strengthText = "Moyen";
-          DOMElements.strengthIndicator.style.backgroundColor =
-            "var(--strength-medium)";
-        } else if (strengthLevel < 0.75) {
-          strengthText = "Fort";
-          DOMElements.strengthIndicator.style.backgroundColor =
-            "var(--strength-strong)";
-        } else {
-          strengthText = "Très fort";
-          DOMElements.strengthIndicator.style.backgroundColor =
-            "var(--strength-very-strong)";
-        }
-
-        DOMElements.strengthIndicator.style.width = `${strengthLevel * 100}%`;
-        return { text: strengthText, score: strengthLevel };
-      }
-
-      function updateStrengthDisplay(pwd = DOMElements.passwordOutput.value) {
-        const { text } = evaluateStrength(pwd);
-        DOMElements.strengthText.textContent = `Robustesse : ${text}`;
-      }
-
-      // Limites dynamiques min/max
-      function adjustMinMaxLimits() {
-        const totalLength = parseInt(DOMElements.lengthSelect.value, 10);
-        let currentMins = 0;
-
-        const charTypes = ["lower", "upper", "digits", "special"];
-        const charMins = {};
-
-        charTypes.forEach((type) => {
-          const checkbox =
-            DOMElements[
-              `include${type.charAt(0).toUpperCase()}${type.slice(1)}`
-            ];
-          const minInput =
-            DOMElements[
-              `min${type.charAt(0).toUpperCase()}${type.slice(1)}`
-            ];
-          charMins[type] = parseInt(minInput.value, 10) || 0;
-          if (checkbox.checked) {
-            currentMins += charMins[type];
+          if (sessionStats.history.length > sessionStats.historyLimit) {
+            sessionStats.history.length = sessionStats.historyLimit;
           }
-        });
 
-        charTypes.forEach((type) => {
-          const minInput =
-            DOMElements[
-              `min${type.charAt(0).toUpperCase()}${type.slice(1)}`
-            ];
-          const checkbox =
-            DOMElements[
-              `include${type.charAt(0).toUpperCase()}${type.slice(1)}`
-            ];
-          const otherMins = currentMins - charMins[type];
-          const newMax = checkbox.checked
-            ? Math.max(0, totalLength - otherMins)
-            : 0;
-          minInput.max = newMax;
-          if (parseInt(minInput.value, 10) > newMax) {
-            minInput.value = newMax;
-          }
-        });
-      }
+          renderDashboard();
+        };
 
-      // Stats + dashboard
-      function updateSessionStats(newPassword) {
-        if (!newPassword) return;
-        const length = newPassword.length;
+        const renderDashboard = () => {
+          DOM.statCount.textContent = String(sessionStats.count);
 
-        sessionStats.count += 1;
-        sessionStats.totalLength += length;
-        sessionStats.lastGeneratedAt = new Date();
-
-        sessionStats.history.unshift({
-          password: newPassword,
-          length,
-          at: sessionStats.lastGeneratedAt,
-        });
-
-        if (sessionStats.history.length > sessionStats.historyLimit) {
-          sessionStats.history.length = sessionStats.historyLimit;
-        }
-
-        renderDashboard();
-      }
-
-      function renderDashboard() {
-        DOMElements.statCount.textContent = sessionStats.count.toString();
-
-        if (sessionStats.count === 0) {
-          DOMElements.statAvgLength.textContent = "0";
-          DOMElements.statLastGenerated.textContent = "—";
-        } else {
-          const avg =
-            sessionStats.totalLength / sessionStats.count;
-          DOMElements.statAvgLength.textContent =
-            avg.toFixed(1);
-          const d = sessionStats.lastGeneratedAt;
-          const h = String(d.getHours()).padStart(2, "0");
-          const m = String(d.getMinutes()).padStart(2, "0");
-          DOMElements.statLastGenerated.textContent = `${h}h${m}`;
-        }
-
-        DOMElements.historyList.innerHTML = "";
-        sessionStats.history.forEach((item) => {
-          const li = document.createElement("li");
-          const pwdSpan = document.createElement("span");
-          pwdSpan.className = "history-password";
-          pwdSpan.textContent = item.password;
-
-          const metaSpan = document.createElement("span");
-          metaSpan.className = "history-meta";
-          const d = item.at;
-          const h = String(d.getHours()).padStart(2, "0");
-          const m = String(d.getMinutes()).padStart(2, "0");
-          metaSpan.textContent = `${item.length}c · ${h}h${m}`;
-
-          li.appendChild(pwdSpan);
-          li.appendChild(metaSpan);
-
-          DOMElements.historyList.appendChild(li);
-        });
-      }
-
-      // Navigation mono-page
-      function setActiveSection(sectionId) {
-        DOMElements.sections.forEach((section) => {
-          const isActive = section.id === sectionId;
-          section.classList.toggle("section--active", isActive);
-        });
-
-        DOMElements.navLinks.forEach((link) => {
-          const isActive = link.dataset.section === sectionId;
-          link.classList.toggle("nav-link--active", isActive);
-          if (isActive) {
-            link.setAttribute("aria-current", "page");
+          if (!sessionStats.lastGeneratedAt || sessionStats.count === 0) {
+            DOM.statAvgLength.textContent = "0";
+            DOM.statLastGenerated.textContent = "—";
           } else {
-            link.removeAttribute("aria-current");
+            DOM.statAvgLength.textContent = (sessionStats.totalLength / sessionStats.count).toFixed(1);
+            DOM.statLastGenerated.textContent = formatHHMM(sessionStats.lastGeneratedAt);
           }
-        });
-      }
 
-      DOMElements.navLinks.forEach((link) => {
-        link.addEventListener("click", (event) => {
-          event.preventDefault();
-          const target = link.dataset.section;
-          if (target) {
-            setActiveSection(target);
+          DOM.historyList.innerHTML = "";
+          for (const item of sessionStats.history) {
+            const li = document.createElement("li");
+
+            const pwdSpan = document.createElement("span");
+            pwdSpan.className = "history-password";
+            pwdSpan.textContent = item.password;
+
+            const metaSpan = document.createElement("span");
+            metaSpan.className = "history-meta";
+            metaSpan.textContent = `${item.length}c · ${formatHHMM(item.at)}`;
+
+            li.appendChild(pwdSpan);
+            li.appendChild(metaSpan);
+
+            DOM.historyList.appendChild(li);
           }
-        });
-      });
+        };
 
-      // Thème persistant
-      function applyThemeFromStorage() {
-        const storedTheme = localStorage.getItem("pwgen-theme");
-        if (storedTheme === "dark") {
-          DOMElements.body.classList.add("dark");
-          DOMElements.themeToggle.textContent = "Mode clair";
-        } else {
-          DOMElements.body.classList.remove("dark");
-          DOMElements.themeToggle.textContent = "Mode sombre";
-        }
-      }
+        const setPasswordOutput = (pwd) => {
+          DOM.passwordOutput.value = pwd;
+          updateStrengthDisplay(pwd);
+          updateSessionStats(pwd);
+          DOM.passwordOutput.focus();
+        };
 
-      DOMElements.themeToggle.addEventListener("click", () => {
-        DOMElements.body.classList.toggle("dark");
-        const isDark = DOMElements.body.classList.contains("dark");
-        localStorage.setItem("pwgen-theme", isDark ? "dark" : "light");
-        DOMElements.themeToggle.textContent = isDark
-          ? "Mode clair"
-          : "Mode sombre";
-      });
+        const adjustMinMaxLimits = () => {
+          const totalLength = clampInt(parseInt(DOM.lengthSelect.value, 10), 1, 50);
 
-      // Gestionnaires d’événements principaux
-      DOMElements.generateBtn.addEventListener("click", () => {
-        const pwd = generatePassword();
-        DOMElements.passwordOutput.value = pwd;
-        DOMElements.toggleVisibilityBtn.textContent = "🙈";
-        updateStrengthDisplay(pwd);
-        updateSessionStats(pwd);
-        DOMElements.passwordOutput.focus();
-      });
+          const types = [
+            { key: "lower", check: DOM.includeLower, min: DOM.minLower },
+            { key: "upper", check: DOM.includeUpper, min: DOM.minUpper },
+            { key: "digits", check: DOM.includeDigits, min: DOM.minDigits },
+            { key: "special", check: DOM.includeSpecial, min: DOM.minSpecial },
+          ];
 
-      DOMElements.copyBtn.addEventListener("click", () => {
-        const pwd = DOMElements.passwordOutput.value;
-        if (!pwd) return;
-        navigator.clipboard
-          .writeText(pwd)
-          .then(() => {
-            DOMElements.copyBtn.textContent = "Copié !";
-            setTimeout(() => {
-              DOMElements.copyBtn.textContent = "Copier 📋";
+          const mins = new Map(types.map((t) => [t.key, clampInt(parseInt(t.min.value, 10) || 0, 0, 50)]));
+
+          const totalMins = () => Array.from(mins.values()).reduce((a, b) => a + b, 0);
+
+          for (const t of types) {
+            if (!t.check.checked) {
+              t.min.value = "0";
+              t.min.disabled = true;
+              mins.set(t.key, 0);
+            } else {
+              t.min.disabled = false;
+              mins.set(t.key, clampInt(parseInt(t.min.value, 10) || 0, 0, 50));
+            }
+          }
+
+          for (const t of types) {
+            const others = totalMins() - (mins.get(t.key) || 0);
+            const maxAllowed = t.check.checked ? Math.max(0, totalLength - others) : 0;
+            t.min.max = String(maxAllowed);
+
+            const cur = mins.get(t.key) || 0;
+            const clamped = clampInt(cur, 0, maxAllowed);
+            if (clamped !== cur) {
+              t.min.value = String(clamped);
+              mins.set(t.key, clamped);
+            }
+          }
+        };
+
+        const runGenerate = () => {
+          const pwd = generatePassword();
+          setPasswordOutput(pwd);
+        };
+
+        const copyPassword = async () => {
+          const pwd = DOM.passwordOutput.value;
+          if (!pwd) return;
+
+          try {
+            await navigator.clipboard.writeText(pwd);
+            const original = DOM.copyBtn.textContent;
+            DOM.copyBtn.textContent = "Copié";
+            window.setTimeout(() => {
+              DOM.copyBtn.textContent = original || "Copier";
             }, 1500);
-          })
-          .catch(() => {
-            DOMElements.errorMessage.textContent =
-              "Échec de la copie. Veuillez copier manuellement.";
-            setTimeout(() => {
-              DOMElements.errorMessage.textContent = "";
-            }, 3000);
+          } catch {
+            setError("Échec de la copie. Veuillez copier manuellement.");
+            window.setTimeout(() => setError(""), 3000);
+          }
+        };
+
+        const togglePasswordVisibility = () => {
+          const isHidden = DOM.passwordOutput.type === "password";
+          DOM.passwordOutput.type = isHidden ? "text" : "password";
+          DOM.toggleVisibilityBtn.textContent = isHidden ? "Masquer" : "Afficher";
+        };
+
+        // -----------------------
+        // Converter
+        // -----------------------
+        const ASCII_C0_NAMES = Object.freeze([
+          "NUL","SOH","STX","ETX","EOT","ENQ","ACK","BEL",
+          "BS","HT","LF","VT","FF","CR","SO","SI",
+          "DLE","DC1","DC2","DC3","DC4","NAK","SYN","ETB",
+          "CAN","EM","SUB","ESC","FS","GS","RS","US",
+        ]);
+
+        const ASCII_C1_NAMES = Object.freeze([
+          "PAD","HOP","BPH","NBH","IND","NEL","SSA","ESA",
+          "HTS","HTJ","VTS","PLD","PLU","RI","SS2","SS3",
+          "DCS","PU1","PU2","STS","CCH","MW","SPA","EPA",
+          "SOS","SGCI","SCI","CSI","ST","OSC","PM","APC",
+        ]);
+
+        /** @param {number} val */
+        const asciiSymbol = (val) => {
+          // Représentation visuelle explicite pour 0..31 + 127 (Control Pictures).
+          if (val >= 0 && val <= 31) return String.fromCharCode(0x2400 + val); // ␀..␟
+          if (val === 32) return String.fromCharCode(0x2423); // ␣ (SP)
+          if (val === 127) return String.fromCharCode(0x2421); // ␡ (DEL)
+          // Pour 128..255, on affiche le caractère Latin-1 quand c'est visible.
+          // 128..159 sont des contrôles (C1) dans ISO-8859-1.
+          if (val >= 160 && val <= 255) return String.fromCharCode(val);
+          return ""; // contrôles C1 => pas de glyph “lisible”
+        };
+
+        /** @param {number} val */
+        const asciiName = (val) => {
+          if (val >= 0 && val <= 31) return ASCII_C0_NAMES[val];
+          if (val === 32) return "SP";
+          if (val === 127) return "DEL";
+          if (val >= 128 && val <= 159) return ASCII_C1_NAMES[val - 128];
+          // 160..255 : pas “ASCII” strict, mais Latin-1; on met le point de code.
+          if (val >= 160 && val <= 255) return `Latin-1 (U+00${val.toString(16).toUpperCase().padStart(2, "0")})`;
+          if (val >= 33 && val <= 126) return `U+00${val.toString(16).toUpperCase().padStart(2, "0")}`;
+          return "";
+        };
+
+        /** @param {number} val */
+        const toAscii = (val) => {
+          if (val < 0 || val > 255) return "";
+          const sym = asciiSymbol(val);
+          const name = asciiName(val);
+
+          // Toujours une sortie "visible" + un libellé, même pour 128..159.
+          const shown = sym ? escapeHtml(sym) : "—";
+          return (
+            `<span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;">${shown}</span>` +
+            `<span style="margin-left:0.5rem;color:rgba(0,0,0,0.55);font-size:0.9em;">(${escapeHtml(name)})</span>`
+          );
+        };
+
+        /** @param {number} val */
+        const toHex = (val) => {
+          if (val < 0 || val > 255) return "";
+          return `0x${val.toString(16).toUpperCase().padStart(2, "0")}`;
+        };
+
+        /** @param {number} val */
+        const toBin = (val) => {
+          if (val < 0 || val > 255) return "";
+          return val.toString(2).padStart(8, "0");
+        };
+
+        const runConversion = () => {
+          const val = parseInt(DOM.decimalInput.value, 10);
+          if (!Number.isInteger(val) || val < 0 || val > 255) {
+            DOM.converterResult.innerHTML = `<span style="color:#e74c3c">Entrée invalide (0-255)</span>`;
+            return;
+          }
+
+          DOM.converterResult.innerHTML =
+            `<table style="width:100%;font-size:1em;border-collapse:collapse;background:#fff;border-radius:0.7em;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;">` +
+            `<thead style="background:#f7f7f7;"><tr>` +
+            `<th style="text-align:left;padding:0.7em 1em;">Décimal</th>` +
+            `<th style="padding:0.7em 1em;">ASCII / Latin-1</th>` +
+            `<th style="padding:0.7em 1em;">Hexadécimal</th>` +
+            `<th style="padding:0.7em 1em;">Binaire</th>` +
+            `</tr></thead><tbody>` +
+            `<tr style="border-bottom:1px solid #eee;">` +
+            `<td style="padding:0.6em 1em;">${val}</td>` +
+            `<td style="padding:0.6em 1em;">${toAscii(val)}</td>` +
+            `<td style="padding:0.6em 1em;">${toHex(val)}</td>` +
+            `<td style="padding:0.6em 1em;">${toBin(val)}</td>` +
+            `</tr></tbody></table>` +
+            `<div style="margin-top:0.75rem;font-size:0.9rem;opacity:0.85;">` +
+            `Note : 0–127 = ASCII. 128–255 = octets “étendus” (affichage Latin-1 si imprimable).` +
+            `</div>`;
+        };
+
+        // -----------------------
+        // IP Calculator
+        // -----------------------
+        const calcIPInfo = (ip, maskBits) => {
+          const bits = clampInt(maskBits, 0, 32);
+          const ipU32 = ipToU32(ip);
+          const maskU32 = maskBitsToU32(bits);
+
+          const networkU32 = (ipU32 & maskU32) >>> 0;
+          const broadcastU32 = (networkU32 | (~maskU32)) >>> 0;
+
+          let hostCount;
+          if (bits === 32) hostCount = 1;
+          else if (bits === 31) hostCount = 2;
+          else hostCount = Math.max(0, (2 ** (32 - bits)) - 2);
+
+          let firstHost = "—";
+          let lastHost = "—";
+          if (bits <= 30) {
+            firstHost = u32ToIp((networkU32 + 1) >>> 0);
+            lastHost = u32ToIp((broadcastU32 - 1) >>> 0);
+          } else if (bits === 31) {
+            firstHost = u32ToIp(networkU32);
+            lastHost = u32ToIp(broadcastU32);
+          } else if (bits === 32) {
+            firstHost = u32ToIp(networkU32);
+            lastHost = u32ToIp(networkU32);
+          }
+
+          const ipParts = ip.split(".").map((x) => Number(x));
+          const maskParts = maskBitsToDotted(bits).split(".").map((x) => Number(x));
+
+          return {
+            cidr: bits,
+            mask: maskBitsToDotted(bits),
+            network: u32ToIp(networkU32),
+            broadcast: u32ToIp(broadcastU32),
+            hostCount,
+            firstHost,
+            lastHost,
+            ipBinary: ipParts.map(decimalToBinary8).join(" . "),
+            maskBinary: maskParts.map(decimalToBinary8).join(" . "),
+          };
+        };
+
+        const renderIPTable = (ip) => {
+          let html = "";
+          html += `<table style="width:100%;font-size:1em;border-collapse:collapse;background:#fff;border-radius:0.7em;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;">`;
+          html += `<thead style="background:#f7f7f7;"><tr>
+              <th style="text-align:left;padding:0.7em 1em;">CIDR</th>
+              <th style="padding:0.7em 1em;">Masque</th>
+              <th style="padding:0.7em 1em;">Réseau</th>
+              <th style="padding:0.7em 1em;">Broadcast</th>
+              <th style="padding:0.7em 1em;">Hôtes</th>
+              <th style="padding:0.7em 1em;">Plage</th>
+            </tr></thead><tbody>`;
+
+          for (let bits = 32; bits >= 0; bits--) {
+            const info = calcIPInfo(ip, bits);
+            html += `<tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.6em 1em;">/${info.cidr}</td>
+                <td style="padding:0.6em 1em;">${info.mask}</td>
+                <td style="padding:0.6em 1em;">${info.network}</td>
+                <td style="padding:0.6em 1em;">${info.broadcast}</td>
+                <td style="padding:0.6em 1em;">${info.hostCount}</td>
+                <td style="padding:0.6em 1em;">${info.firstHost} - ${info.lastHost}</td>
+              </tr>`;
+          }
+
+          html += `</tbody></table>`;
+          return html;
+        };
+
+        // -----------------------
+        // Wire events
+        // -----------------------
+        const initNavigation = () => {
+          DOM.navLinks.forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              e.preventDefault();
+              const target = btn.dataset.section;
+              if (target) setActiveSection(target);
+            });
           });
-      });
+        };
 
-      DOMElements.toggleVisibilityBtn.addEventListener("click", () => {
-        const currentType = DOMElements.passwordOutput.type;
-        if (currentType === "password") {
-          DOMElements.passwordOutput.type = "text";
-          DOMElements.toggleVisibilityBtn.textContent = "🙈";
-        } else {
-          DOMElements.passwordOutput.type = "password";
-          DOMElements.toggleVisibilityBtn.textContent = "👁️";
-        }
-      });
+        const initGeneratorEvents = () => {
+          DOM.generateBtn.addEventListener("click", runGenerate);
+          DOM.copyBtn.addEventListener("click", copyPassword);
+          DOM.toggleVisibilityBtn.addEventListener("click", togglePasswordVisibility);
 
-      DOMElements.avoidConsecutive.addEventListener("change", () => {
-        adjustMinMaxLimits();
-        updateStrengthDisplay();
-        DOMElements.generateBtn.click();
-      });
+          const syncNumberDisabled = (checkbox, input) => {
+            input.disabled = !checkbox.checked;
+            if (!checkbox.checked) input.value = "0";
+          };
 
-      const charOptionInputs = [
-        { checkbox: DOMElements.includeLower, number: DOMElements.minLower },
-        { checkbox: DOMElements.includeUpper, number: DOMElements.minUpper },
-        { checkbox: DOMElements.includeDigits, number: DOMElements.minDigits },
-        {
-          checkbox: DOMElements.includeSpecial,
-          number: DOMElements.minSpecial,
-        },
-      ];
+          const pairs = [
+            [DOM.includeLower, DOM.minLower],
+            [DOM.includeUpper, DOM.minUpper],
+            [DOM.includeDigits, DOM.minDigits],
+            [DOM.includeSpecial, DOM.minSpecial],
+          ];
 
-      charOptionInputs.forEach((item) => {
-        item.number.disabled = !item.checkbox.checked;
+          for (const [check, num] of pairs) {
+            syncNumberDisabled(check, num);
 
-        item.checkbox.addEventListener("change", () => {
-          item.number.disabled = !item.checkbox.checked;
-          if (!item.checkbox.checked) {
-            item.number.value = "0";
-          } else if (
-            parseInt(item.number.value, 10) === 0 ||
-            item.number.value === ""
-          ) {
-            item.number.value = "1";
+            check.addEventListener("change", () => {
+              syncNumberDisabled(check, num);
+              if (check.checked && (parseInt(num.value, 10) || 0) === 0) num.value = "1";
+              adjustMinMaxLimits();
+              runGenerate();
+            });
+
+            num.addEventListener("input", () => {
+              const v = clampInt(parseInt(num.value, 10) || 0, 0, 50);
+              num.value = String(v);
+              check.checked = v > 0;
+              syncNumberDisabled(check, num);
+              adjustMinMaxLimits();
+              runGenerate();
+            });
           }
+
+          DOM.lengthSelect.addEventListener("change", () => {
+            adjustMinMaxLimits();
+            runGenerate();
+          });
+
+          DOM.avoidConsecutive.addEventListener("change", () => {
+            adjustMinMaxLimits();
+            runGenerate();
+          });
+        };
+
+        const initConverterEvents = () => {
+          DOM.converterForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            runConversion();
+          });
+        };
+
+        const initIPCalcEvents = () => {
+          DOM.ipCalcForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const ip = DOM.ipInput.value.trim();
+            if (!isValidIPv4(ip)) {
+              DOM.ipCalcResult.innerHTML = `<span style="color:#e74c3c">IP invalide</span>`;
+              return;
+            }
+
+            DOM.ipCalcResult.innerHTML = renderIPTable(ip);
+          });
+        };
+
+        const initThemeEvents = () => {
+          DOM.themeToggle.addEventListener("click", toggleTheme);
+        };
+
+        const initDefaults = () => {
+          applyThemeFromStorage();
+
+          DOM.lengthSelect.value = "20";
+          DOM.includeLower.checked = true;
+          DOM.includeUpper.checked = true;
+          DOM.includeDigits.checked = true;
+          DOM.includeSpecial.checked = true;
+
+          DOM.minLower.value = "3";
+          DOM.minUpper.value = "3";
+          DOM.minDigits.value = "3";
+          DOM.minSpecial.value = "5";
+
+          DOM.passwordOutput.type = "password";
+          DOM.toggleVisibilityBtn.textContent = "Afficher";
+
           adjustMinMaxLimits();
-          updateStrengthDisplay();
-          DOMElements.generateBtn.click();
+          renderDashboard();
+          runGenerate();
+        };
+
+        // -----------------------
+        // Boot
+        // -----------------------
+        window.addEventListener("load", () => {
+          initNavigation();
+          initThemeEvents();
+          initGeneratorEvents();
+          initConverterEvents();
+          initIPCalcEvents();
+          initDefaults();
         });
-
-        item.number.addEventListener("input", () => {
-          if (parseInt(item.number.value, 10) === 0) {
-            item.checkbox.checked = false;
-            item.number.disabled = true;
-          } else {
-            item.checkbox.checked = true;
-            item.number.disabled = false;
-          }
-          adjustMinMaxLimits();
-          updateStrengthDisplay();
-          DOMElements.generateBtn.click();
-        });
-      });
-
-      DOMElements.lengthSelect.addEventListener("change", () => {
-        adjustMinMaxLimits();
-        updateStrengthDisplay();
-        DOMElements.generateBtn.click();
-      });
-
-      // Initialisation
-      window.addEventListener("load", () => {
-        applyThemeFromStorage();
-
-        charOptionInputs.forEach((item) => {
-          item.number.disabled = !item.checkbox.checked;
-        });
-
-        DOMElements.includeLower.checked = true;
-        DOMElements.includeUpper.checked = true;
-        DOMElements.includeDigits.checked = true;
-        DOMElements.includeSpecial.checked = true;
-        DOMElements.minLower.value = "3";
-        DOMElements.minUpper.value = "3";
-        DOMElements.minDigits.value = "3";
-        DOMElements.minSpecial.value = "5";
-        DOMElements.lengthSelect.value = "20";
-
-        DOMElements.passwordOutput.type = "text";
-        DOMElements.toggleVisibilityBtn.textContent = "🙈";
-
-        adjustMinMaxLimits();
-        renderDashboard();
-        DOMElements.generateBtn.click();
-      });
+      })();
     </script>
   </body>
 </html>

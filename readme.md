@@ -1,66 +1,34 @@
+# SkyBlyvion.github.io-main
 
-# Cahier des charges
+## Présentation
+Générateur de mots de passe sécurisé et convertisseur décimal/ASCII/hexadécimal/binaire, 100% local, sans tracking ni serveur.
 
-## Projet : Générateur de mot de passe sécurisé
-
-### Spécifications initiales
-
-- Génération de mot de passe
-- Longueurs possibles : 8, 12, 16, 20 caractères
-- Chiffres : 0 - 9
-- Lettres minuscules et majuscules : a - Z
-- Caractères spéciaux : %$
-
----
-
-## Objectif
-
-Créer une application simple, rapide et sécurisée permettant de générer des mots de passe aléatoires répondant à des critères personnalisables de sécurité.
-
----
-
-## Fonctionnalités attendues
-
-- Génération de plusieurs mots de passe à la demande
-- Longueurs disponibles : **8**, **12**, **16**, **20** caractères
-- Types de caractères pris en charge :
-  - Lettres minuscules : `a-z`
-  - Lettres majuscules : `A-Z`
-  - Chiffres : `0-9`
-  - Caractères spéciaux : `%$` (extensible à d’autres comme `!@#^&*`)
-- Personnalisation :
-  - Sélection des types de caractères à inclure (via interface ou paramètres)
-- Affichage du ou des mots de passe générés
-- Bouton pour copier le mot de passe dans le presse-papiers
-- Fonction de régénération
-- Mode sombre / clair
-- Évaluation de la solidité du mot de passe généré
-
----
-
-## Interface utilisateur
-
-- Sélecteur pour la longueur du mot de passe (menu déroulant ou boutons radio)
-- Cases à cocher pour activer/désactiver :
-  - Lettres majuscules
-  - Lettres minuscules
-  - Chiffres
-  - Caractères spéciaux
-- Bouton **Générer**
-- Champ en lecture seule pour afficher le mot de passe
-- Bouton **Copier**
-
----
-
-## Contraintes techniques
-
-- Application web légère (HTML / CSS / JavaScript pur)
-- Code lisible et commenté
-- Fonctionnement 100 % local (aucune dépendance serveur)
-
----
+## Fonctionnalités principales
+- Générateur de mots de passe personnalisable (longueur, types de caractères, minimums par type, anti-doublons consécutifs)
+- Évaluation de la robustesse du mot de passe
+- Historique local des mots de passe générés
+- Convertisseur décimal : affiche la valeur ASCII, hexadécimale et binaire pour toute valeur entre 0 et 255
+- Calculateur d'adresse IP (CIDR, masque, plage, etc.)
+- Interface moderne, responsive, mode sombre
 
 ## Sécurité
+- Toutes les opérations sont réalisées localement dans le navigateur
+- Aucune donnée n'est envoyée à un serveur
+- Génération aléatoire via `crypto.getRandomValues`
 
-- Génération de mot de passe à partir d’une source de hasard cryptographique (`crypto.getRandomValues` en JavaScript)
-- Aucune information n’est envoyée à un serveur externe
+## Utilisation
+1. Ouvrez simplement `index.html` dans votre navigateur
+2. Utilisez les onglets pour accéder au générateur, convertisseur ou calculateur IP
+3. Aucun prérequis, aucune installation
+
+## Conventions et bonnes pratiques
+- Respect strict de la plage 0-255 pour le convertisseur décimal
+- Affichage ASCII uniquement pour les caractères imprimables (32-126), sinon le code décimal est grisé
+- Code commenté et lisible, tout dans `index.html`
+
+## Développement
+- Modifiez directement `index.html` pour toute évolution
+- Utilisez les outils de développement du navigateur pour déboguer
+
+## Licence
+MIT
